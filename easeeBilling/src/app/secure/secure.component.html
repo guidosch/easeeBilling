@@ -1,3 +1,30 @@
+<div class="container">
+    <h2>Abrechnung Ladestationen (Nutzungdauer von xy bis z)</h2>
+    <table class="table table-bordered table-dark">
+        <thead>
+            <tr>
+                <th>Parkplatz</th>
+                <th>Nutzer</th>
+                <th>Total kWh</th>
+                <th>Total kWh Niedertarif</th>
+                <th>Total kWh Hochtarif</th>
+                <th>Total Kosten</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let charger of chargers; let i = index">
+                <td>{{charger.name}}</td>
+                <td>{{getUsers(charger.permissions)}}</td>
+                <td>{{charger.totalConsumptionKWhHighRate+charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
+                <td>{{charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
+                <td>{{charger.totalConsumptionKWhHighRate | number: '1.0-2'}}</td>
+                <td>{{charger.totalCostsInPeriod | number: '1.0-2'}} </td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <div class="example-container mat-elevation-z8">
     <div class="example-loading-shade" *ngIf="isLoadingResults">
         <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
@@ -6,6 +33,11 @@
         <h4>{{message}}</h4>
         <div class="button-row">
             <a mat-flat-button color="primary" (click)="logout()"><mat-icon>logout</mat-icon>Logout</a>
+        </div>
+    </mat-card>
+    <mat-card class="example-card">
+        <div class="button-row">
+            <a mat-flat-button color="primary" (click)="loadData()"><mat-icon>load data</mat-icon>Load</a>
         </div>
     </mat-card>
 </div>

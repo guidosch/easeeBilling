@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 import { TokenService } from './token.service';
 
@@ -9,11 +8,16 @@ import { TokenService } from './token.service';
 })
 export class AuthGuard implements CanActivate {
   
-  canActivate(
-    next: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot): boolean {
-    const url: string = state.url;
 
+  /**
+   * Interface that a class can implement to be a guard deciding if a route can be activated.
+   * If all guards return true, navigation continues. If any guard returns false, navigation is cancelled.
+   * @param next 
+   * @param state 
+   * @returns 
+   */
+  canActivate( next: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    const url: string = state.url;
     return this.checkLogin(url);
   }
   

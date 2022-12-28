@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
-import { EaseeApiService } from "../easee-api.service";
-import { forkJoin, Observable, map } from 'rxjs';
-import { Charger, allChargers, Permission, PowerUsage } from "../Chargers";
+import {Component, OnInit} from '@angular/core';
+import {AuthService} from '../auth.service';
+import {Router} from '@angular/router';
+import {EaseeApiService} from "../easee-api.service";
+import {forkJoin, map} from 'rxjs';
+import {allChargers, Charger, Permission, PowerUsage} from "../Chargers";
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
 const HIGH_RATE = 0.4077;
@@ -58,6 +58,7 @@ export class SecureComponent implements OnInit {
 
 
   loadData(): void {
+    this.isLoadingResults = true;
     let from: string = "2022-12-01";
     let to: string = "2022-12-31";
     let observables = this.chargerIDs().map((id: string) => {
@@ -74,18 +75,12 @@ export class SecureComponent implements OnInit {
       });
       return result;
     })).subscribe((data) => {
-      
-      /**
-      data.sort((a, b)=> {
-
-        let ppNumberA = a.name.match(/\d+/).shift()
-      });
-       */
+      data = data.sort(sortChargersByPPNumber);
+      data = data.filter(data => data.totalCostsInPeriod > 0);
       this.chargers = data;
+      this.isLoadingResults = false;
     });
   }
-
-
 
   chargerIDs(): Array<string> {
     return allChargers.map(elem => elem.id)
@@ -98,25 +93,69 @@ export class SecureComponent implements OnInit {
 
 }
 
+function sortChargersByPPNumber(a: Charger, b: Charger) {
+  // @ts-ignore
+  let ppNumberA = a.name.match(/\d+/).shift();
+  // @ts-ignore
+  let ppNumberB = b.name.match(/\d+/).shift();
+  // @ts-ignore
+  if (ppNumberA < ppNumberB) {
+    return -1;
+  }
+  // @ts-ignore
+  if (ppNumberA > ppNumberB) {
+    return 1;
+  }
+  return 0;
+}
 
 function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
   powerUsage.forEach(element => {
     let localTime = new Date(element.from).toLocaleTimeString();
     switch (localTime) {
+      case "09:00:00":
+        element.highRate = false;
+        element.solarPower = true;
+        break;
+      case "10:00:00":
+        element.highRate = false;
+        element.solarPower = true;
+        break;
       case "11:00:00":
         element.highRate = true;
+        element.solarPower = true;
         break;
       case "12:00:00":
         element.highRate = true;
+        element.solarPower = true;
+        break;
+      case "13:00:00":
+        element.highRate = false;
+        element.solarPower = true;
+        break;
+      case "14:00:00":
+        element.highRate = false;
+        element.solarPower = true;
+        break;
+      case "15:00:00":
+        element.highRate = false;
+        element.solarPower = true;
+        break;
+      case "16:00:00":
+        element.highRate = false;
+        element.solarPower = false;
         break;
       case "18:00:00":
         element.highRate = true;
+        element.solarPower = false;
         break;
       case "19:00:00":
         element.highRate = true;
+        element.solarPower = false;
         break;
       default:
         element.highRate = false;
+        element.solarPower = false;
         break;
     }
   });
@@ -127,6 +166,7 @@ function sumCosts(charger: Charger) {
   let sum = 0;
   let kWhHigh = 0;
   let kWhLow = 0;
+  let solarPower = 0;
   charger.powerUsage.forEach(entry => {
     if (entry.totalEnergy > 0) {
       if (entry.highRate) {
@@ -136,10 +176,14 @@ function sumCosts(charger: Charger) {
         sum += entry.totalEnergy * LOW_RATE
         kWhLow += entry.totalEnergy;
       }
+      if (entry.solarPower){
+        solarPower += entry.totalEnergy;
+      }
     }
   });
   charger.totalConsumptionKWhHighRate = kWhHigh;
   charger.totalConsumptionKWhLowRate = kWhLow;
   charger.totalCostsInPeriod = sum;
+  charger.totalConsumptionEligibleForSolar = solarPower;
 }
 

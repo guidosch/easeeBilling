@@ -6,6 +6,7 @@ export interface Charger {
     totalCostsInPeriod: number,
     totalConsumptionKWhHighRate: number,
     totalConsumptionKWhLowRate: number,
+    totalConsumptionEligibleForSolar:number
 }
 
 export interface Permission {
@@ -20,6 +21,7 @@ export interface PowerUsage {
     to: string;
     totalEnergy: number;
     highRate: boolean;
+    solarPower : boolean;
 }
 
 
@@ -35,7 +37,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECRMV6TM",
@@ -51,7 +54,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECKR3P9L",
@@ -67,7 +71,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC7Q7HTK",
@@ -83,7 +88,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECSL3273",
@@ -99,7 +105,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC7UXPB3",
@@ -115,7 +122,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECHLAGAB",
@@ -131,7 +139,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC7QDYG5",
@@ -153,7 +162,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECG9SHR7",
@@ -162,7 +172,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC4JZNS6",
@@ -178,7 +189,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECYLW5H8",
@@ -194,7 +206,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECTX9X4Y",
@@ -203,7 +216,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC3APZ3F",
@@ -219,7 +233,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECNPY3WN",
@@ -235,7 +250,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC335SXB",
@@ -251,7 +267,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECLSGWN8",
@@ -267,7 +284,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC7X44AM",
@@ -276,7 +294,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECH6GBGV",
@@ -285,7 +304,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECHZTN6Q",
@@ -294,7 +314,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECUL8BPJ",
@@ -303,7 +324,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC3BNMC4",
@@ -312,7 +334,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECFQRAWG",
@@ -321,7 +344,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECXV4J7T",
@@ -337,7 +361,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC9JHGTL",
@@ -346,7 +371,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECXZMAN9",
@@ -368,7 +394,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC7KPM3H",
@@ -384,7 +411,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC5GWULA",
@@ -393,7 +421,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECU46ZBF",
@@ -409,7 +438,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECX5ZCQX",
@@ -425,7 +455,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC8UC36H",
@@ -434,7 +465,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC6WZ9PX",
@@ -456,7 +488,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECXNVRZC",
@@ -465,7 +498,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "EC2EMHGM",
@@ -474,7 +508,8 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     },
     {
         "id": "ECT8Y3HR",
@@ -483,6 +518,7 @@ export const allChargers: Charger[] = [
         "powerUsage": [],
         "totalCostsInPeriod": 0,
         "totalConsumptionKWhHighRate": 0,
-        "totalConsumptionKWhLowRate": 0
+        "totalConsumptionKWhLowRate": 0,
+        "totalConsumptionEligibleForSolar": 0
     }
 ]

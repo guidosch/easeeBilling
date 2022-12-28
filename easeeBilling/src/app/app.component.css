@@ -1,28 +1,31 @@
-.container {
+  .container {
     padding: 20px;
   }
-  
-  .example-container {
+
+  .easee-container {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  
-  .example-form {
+
+  .easee-card {
     min-width: 150px;
-    max-width: 500px;
+    max-width: 300px;
+    width: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .easee-full-width {
     width: 100%;
   }
-  
-  .example-full-width {
-    width: 100%;
-  }
-  
-  .example-full-width:nth-last-child(0) {
+
+  .easee-full-width:nth-last-child(0) {
     margin-bottom: 10px;
   }
-  
+
   .button-row {
     margin: 10px 0;
     /*
@@ -30,7 +33,7 @@
       margin-right: 10px
     }*/
   }
-  
+
   .mat-flat-button {
     width: 120px;
     margin: 5px;

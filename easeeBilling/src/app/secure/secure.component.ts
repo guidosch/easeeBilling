@@ -4,6 +4,7 @@ import {Router} from '@angular/router';
 import {EaseeApiService} from "../easee-api.service";
 import {forkJoin, map} from 'rxjs';
 import {allChargers, Charger, Permission, PowerUsage} from "../Chargers";
+import {User} from "../User";
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
 const HIGH_RATE = 0.4077;
@@ -16,12 +17,9 @@ const LOW_RATE = 0.1449;
 })
 export class SecureComponent implements OnInit {
 
-  getUsers(permissions: Permission[]) {
-    return permissions.map(entry => entry.name).join(",");
-  }
-
-  message = '';
+  currentUser = '';
   isLoadingResults = false;
+  displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
   chargers: Charger[] = [];
 
   constructor(private authService: AuthService, private esaeeApi: EaseeApiService, private router: Router) { }
@@ -29,16 +27,15 @@ export class SecureComponent implements OnInit {
   ngOnInit(): void {
     this.isLoadingResults = true;
     this.authService.secured()
-      .subscribe((data: any) => {
-        this.message = data;
-        console.log(data);
+      .subscribe((data: User) => {
+        this.currentUser = data.firstName+" "+data.lastName;
         this.isLoadingResults = false;
       });
   }
 
 
 
-  mapChargerToPerissionData(): void {
+  mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations
     let observables = this.chargerIDs().map((id: string) => {
       return this.esaeeApi.getChargerPermissions(id);
@@ -70,7 +67,9 @@ export class SecureComponent implements OnInit {
       response.map((powerUsage: PowerUsage[], index: number) => {
         let charger = allChargers[index];
         charger.powerUsage = checkTimeForHighRate(powerUsage)
+        charger.users = getUsers(charger.permissions);
         sumCosts(charger);
+        charger.totalConsumption = charger.totalConsumptionKWhLowRate+charger.totalConsumptionKWhHighRate;
         result.push(charger);
       });
       return result;
@@ -91,6 +90,33 @@ export class SecureComponent implements OnInit {
     this.router.navigate(['/login']).then(_ => console.log('Logout'));
   }
 
+  getTotalConsumptionHighRate() {
+    return this.chargers.map(charger => charger.totalConsumptionKWhHighRate).reduce((sum, value)=> sum + value, 0);
+  }
+
+  getTotalConsumptionLowRate() {
+    return this.chargers.map(charger => charger.totalConsumptionKWhLowRate).reduce((sum, value)=> sum + value, 0);
+  }
+
+  getTotalConsumptionEligibleForSolar() {
+    return this.chargers.map(charger => charger.totalConsumptionEligibleForSolar).reduce((sum, value)=> sum + value, 0);
+  }
+
+  getTotalCostInPeriod() {
+    return this.chargers.map(charger => charger.totalCostsInPeriod).reduce((sum, value)=> sum + value, 0);
+  }
+
+  /**
+   * todo: delete if mat table works
+   * @param permissions
+   */
+  getUsers(permissions: Permission[]) {
+    return permissions.map(entry => entry.name).join(",");
+  }
+}
+
+function getUsers(permissions: Permission[]) {
+  return permissions.map(entry => entry.name).join(",");
 }
 
 function sortChargersByPPNumber(a: Charger, b: Charger) {

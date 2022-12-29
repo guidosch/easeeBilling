@@ -1,45 +1,110 @@
 <div class="container">
-    <h2>Abrechnung Ladestationen (Nutzungdauer von xy bis z)</h2>
-    <table class="table table-bordered table-dark">
-        <thead>
-            <tr>
-                <th>Parkplatz</th>
-                <th>Nutzer</th>
-                <th>Total kWh</th>
-                <th>Total kWh Niedertarif</th>
-                <th>Total kWh Hochtarif</th>
-                <th>Total kWh Solarertrag</th>
-                <th>Total Kosten in CHF</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let charger of chargers; let i = index">
-                <td>{{charger.name}}</td>
-                <td>{{getUsers(charger.permissions)}}</td>
-                <td>{{charger.totalConsumptionKWhHighRate+charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
-                <td>{{charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
-                <td>{{charger.totalConsumptionKWhHighRate | number: '1.0-2'}}</td>
-                <td>{{charger.totalConsumptionEligibleForSolar | number: '1.0-2'}}</td>
+
+  <div *ngIf="isLoadingResults" class="example-loading-shade">
+    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+  </div>
+
+  <div style="float: right">
+    <span>{{currentUser}}</span>
+    <span class="button-row">
+      <a (click)="logout()" color="primary" mat-flat-button>
+        <mat-icon>logout</mat-icon>
+        Logout</a>
+    </span>
+  </div>
+
+  <h2>Abrechnung Ladestationen (Nutzungdauer von xy bis z)</h2>
+
+  <div>
+    <div class="button-row">
+      <a (click)="loadData()" color="primary" mat-flat-button>
+        <mat-icon>load data</mat-icon>
+        Load</a>
+    </div>
+  </div>
+  <table class="table table-bordered table-dark">
+    <thead>
+    <tr>
+      <th>Parkplatz</th>
+      <th>Nutzer</th>
+      <th>Total kWh</th>
+      <th>Total kWh Niedertarif</th>
+      <th>Total kWh Hochtarif</th>
+      <th>Total kWh Solarertrag</th>
+      <th>Total Kosten in CHF</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let charger of chargers; let i = index">
+      <td>{{charger.name}}</td>
+      <td>{{getUsers(charger.permissions)}}</td>
+      <td>{{charger.totalConsumptionKWhHighRate + charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
+      <td>{{charger.totalConsumptionKWhLowRate | number: '1.0-2'}}</td>
+      <td>{{charger.totalConsumptionKWhHighRate | number: '1.0-2'}}</td>
+      <td>{{charger.totalConsumptionEligibleForSolar | number: '1.0-2'}}</td>
                 <td>{{charger.totalCostsInPeriod | number: '1.0-2'}} </td>
                 <td></td>
             </tr>
         </tbody>
     </table>
+
+  <!-- new table -->
+  <div *ngIf="chargers.length > 0">
+  <table mat-table [dataSource]="chargers" class="mat-elevation-z8">
+    <!-- Parkplatz Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Parkplatz # </th>
+      <td mat-cell *matCellDef="let transaction"> {{transaction.item}} </td>
+      <td mat-footer-cell *matFooterCellDef> Total </td>
+    </ng-container>
+
+    <!-- users Column -->
+    <ng-container matColumnDef="users">
+      <th mat-header-cell *matHeaderCellDef> Nutzer </th>
+      <td mat-cell *matCellDef="let charger"> {{charger.users}} </td>
+      <td mat-footer-cell *matFooterCellDef></td>
+    </ng-container>
+
+    <!-- total kWh Column -->
+    <ng-container matColumnDef="totalConsumption">
+      <th mat-header-cell *matHeaderCellDef> Total kWh </th>
+      <td mat-cell *matCellDef="let charger"> {{charger.totalConsumption | number: '1.0-2'}} </td>
+      <td mat-footer-cell *matFooterCellDef> {{getTotalConsumptionHighRate()+getTotalConsumptionLowRate()  | number: '1.0-2'}} </td>
+    </ng-container>
+
+    <!-- total kWh Niedertarif Column -->
+    <ng-container matColumnDef="totalConsumptionKWhLowRate">
+      <th mat-header-cell *matHeaderCellDef> Total kWh Niedertarif </th>
+      <td mat-cell *matCellDef="let charger"> {{ charger.totalConsumptionKWhLowRate | number: '1.0-2'}} </td>
+      <td mat-footer-cell *matFooterCellDef> {{getTotalConsumptionLowRate()  | number: '1.0-2'}} </td>
+    </ng-container>
+
+    <!-- total kWh Hochtarif Column -->
+    <ng-container matColumnDef="totalConsumptionKWhHighRate">
+      <th mat-header-cell *matHeaderCellDef> Total kWh Hochtarif </th>
+      <td mat-cell *matCellDef="let charger"> {{ charger.totalConsumptionKWhHighRate | number: '1.0-2'}} </td>
+      <td mat-footer-cell *matFooterCellDef> {{getTotalConsumptionHighRate()  | number: '1.0-2'}} </td>
+    </ng-container>
+
+    <!-- total kWh Solar el Column -->
+    <ng-container matColumnDef="totalConsumptionEligibleForSolar">
+      <th mat-header-cell *matHeaderCellDef> Total kWh Solarertrag </th>
+      <td mat-cell *matCellDef="let charger"> {{ charger.totalConsumptionEligibleForSolar | number: '1.0-2'}} </td>
+      <td mat-footer-cell *matFooterCellDef> {{getTotalConsumptionEligibleForSolar()  | number: '1.0-2'}} </td>
+    </ng-container>
+
+    <!-- total cost Column -->
+    <ng-container matColumnDef="totalCostsInPeriod">
+      <th mat-header-cell *matHeaderCellDef> Total Kosten in CHF  </th>
+      <td mat-cell *matCellDef="let charger"> {{ charger.totalCostsInPeriod | number: '1.0-2'}} </td>
+      <td mat-footer-cell *matFooterCellDef> {{getTotalCostInPeriod()  | number: '1.0-2'}} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumns"></tr>
+  </table>
+  </div>
 </div>
 
-<div class="easee-container-container mat-elevation-z8">
-    <div class="example-loading-shade" *ngIf="isLoadingResults">
-        <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
-    </div>
-    <mat-card class="easee-card">
-        <h4>{{message}}</h4>
-        <div class="button-row">
-            <a mat-flat-button color="primary" (click)="logout()"><mat-icon>logout</mat-icon>Logout</a>
-        </div>
-    </mat-card>
-    <mat-card class="easee-card">
-        <div class="button-row">
-            <a mat-flat-button color="primary" (click)="loadData()"><mat-icon>load data</mat-icon>Load</a>
-        </div>
-    </mat-card>
-</div>
+

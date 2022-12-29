@@ -77,8 +77,7 @@ export class AuthService {
     this.tokenService.removeRefreshToken();
   }
 
-  secured(): Observable<any> {
-    return this.http.get<User>(API_URL + 'profile')
-      .pipe(catchError(AuthService.handleError));
+  secured(): Observable<User> {
+    return this.http.get<User>(API_URL + 'profile');
   }
 }

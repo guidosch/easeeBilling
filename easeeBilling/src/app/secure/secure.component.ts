@@ -7,11 +7,20 @@ import {allChargers, Charger, Permission, PowerUsage} from "../Chargers";
 import {User} from "../User";
 import {ErrorStateMatcher} from "@angular/material/core";
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
 const HIGH_RATE = 0.4077;
 const LOW_RATE = 0.1449;
+
+var optionsForCSVExport = {
+  showLabels: true,
+  showTitle: true,
+  title: 'Abrechnung Ladestationen Tiechestrasse',
+  headers: ["name", "users", "totalCostsInPeriod"],
+  useHeader: true,
+};
 
 export class MyErrorStateMatcher implements ErrorStateMatcher {
   isErrorState(control: UntypedFormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -59,7 +68,9 @@ export class SecureComponent implements OnInit {
     this.loadData(this.from, this.to);
   }
 
-
+  onExport():void{
+    new AngularCsv(this.chargers, "AbrechnungLadestationen.csv", optionsForCSVExport);
+  }
 
   mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations

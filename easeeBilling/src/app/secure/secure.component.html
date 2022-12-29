@@ -107,6 +107,7 @@
 
   </div>
 
+  <div style="padding-top: 20px" *ngIf="chargers.length> 0"><span class="button-row"><a (click)="onExport()" color="primary" mat-flat-button><mat-icon>download</mat-icon>Export als CSV</a></span></div>
 
   <div *ngIf="isLoadingResults" class="example-loading-shade">
     <mat-spinner *ngIf="isLoadingResults"></mat-spinner>

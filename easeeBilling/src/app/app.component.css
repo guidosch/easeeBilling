@@ -2,6 +2,21 @@
     padding: 20px;
   }
 
+  mat-grid-tile {
+    display: block  !important;
+    justify-content: unset !important;
+  }
+
+  .mat-grid-tile-content {
+    display: block  !important;
+    justify-content: unset !important;
+  }
+
+  main {
+    display: block;
+    justify-content: unset;
+  }
+
   .easee-container {
     height: 100vh;
     display: flex;
@@ -38,3 +53,12 @@
     width: 120px;
     margin: 5px;
   }
+
+  tr.mat-footer-row td {
+    font-weight: bold;
+  }
+
+  table {
+    width: 100%;
+  }
+

@@ -20,15 +20,14 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTableModule} from '@angular/material/table';
 import {MatIconModule} from '@angular/material/icon';
-import { TopBarComponent } from './top-bar/top-bar.component';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     SecureComponent,
-    NotFoundComponent,
-    TopBarComponent
+    NotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -45,7 +44,8 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     MatIconModule,
     MatButtonModule,
     MatCardModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatGridListModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

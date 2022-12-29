@@ -1,28 +1,43 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {AuthService} from '../auth.service';
 import {Router} from '@angular/router';
 import {EaseeApiService} from "../easee-api.service";
 import {forkJoin, map} from 'rxjs';
 import {allChargers, Charger, Permission, PowerUsage} from "../Chargers";
 import {User} from "../User";
+import {ErrorStateMatcher} from "@angular/material/core";
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
 const HIGH_RATE = 0.4077;
 const LOW_RATE = 0.1449;
 
+export class MyErrorStateMatcher implements ErrorStateMatcher {
+  isErrorState(control: UntypedFormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+    const isSubmitted = form && form.submitted;
+    return !!(control && control.invalid && (control.dirty || control.touched || isSubmitted));
+  }
+}
+
 @Component({
   selector: 'app-secure',
   templateUrl: './secure.component.html',
-  styleUrls: ['../app.component.css']
+  styleUrls: ['../app.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class SecureComponent implements OnInit {
 
+  timePeriodForm!: UntypedFormGroup;
+  from = "";
+  to="";
   currentUser = '';
   isLoadingResults = false;
   displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
   chargers: Charger[] = [];
+  matcher = new MyErrorStateMatcher();
 
-  constructor(private authService: AuthService, private esaeeApi: EaseeApiService, private router: Router) { }
+  constructor(private authService: AuthService, private esaeeApi: EaseeApiService, private router: Router, private formBuilder: UntypedFormBuilder) { }
 
   ngOnInit(): void {
     this.isLoadingResults = true;
@@ -31,6 +46,17 @@ export class SecureComponent implements OnInit {
         this.currentUser = data.firstName+" "+data.lastName;
         this.isLoadingResults = false;
       });
+
+    this.timePeriodForm = this.formBuilder.group({
+      from: [null, Validators.required],
+      to: [null, Validators.required]
+    });
+  }
+
+  onFormSubmit(): void {
+    this.from = this.timePeriodForm.value.from+"T00:00:00Z";
+    this.to = this.timePeriodForm.value.to+"T23:59:59Z";
+    this.loadData(this.from, this.to);
   }
 
 
@@ -54,10 +80,8 @@ export class SecureComponent implements OnInit {
   }
 
 
-  loadData(): void {
+  loadData(from:string, to:string): void {
     this.isLoadingResults = true;
-    let from: string = "2022-12-01";
-    let to: string = "2022-12-31";
     let observables = this.chargerIDs().map((id: string) => {
       return this.esaeeApi.getChargerConsumption(id, from, to);
     });

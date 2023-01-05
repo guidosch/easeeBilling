@@ -3,11 +3,12 @@ import {AuthService} from '../auth.service';
 import {Router} from '@angular/router';
 import {EaseeApiService} from "../easee-api.service";
 import {forkJoin, map} from 'rxjs';
-import {allChargers, Charger, Permission, PowerUsage} from "../Chargers";
+import {Charger, Permission, PowerUsage} from "../Chargers";
 import {User} from "../User";
 import {ErrorStateMatcher} from "@angular/material/core";
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
+import { allChargers } from '../ChargersWithUsers';
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022

@@ -2,11 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { PowerUsage, Permission } from './Chargers'
+import { Products } from './Products';
 
 
 const API_CHARGER_CONSUMPTION = "https://api.easee.cloud/api/chargers/{id}/usage/hourly/{from}/{to}";
 
 const API_CHARGER_PERMISSIONS = "https://api.easee.cloud/api/chargers/{id}/permission";
+
+const API_PRODUCTS = "https://api.easee.cloud/api/accounts/products";
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +30,10 @@ export class EaseeApiService {
     let url = API_CHARGER_PERMISSIONS.replace("{id}", id);
 
     return this.http.get<Permission[]>(url);
+  }
+
+  getProducts(): Observable<Products[]> {
+    return this.http.get<Products[]>(API_PRODUCTS);
   }
 
 }

@@ -1,14 +1,15 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {AuthService} from '../auth.service';
-import {Router} from '@angular/router';
-import {EaseeApiService} from "../easee-api.service";
-import {forkJoin, map} from 'rxjs';
-import {Charger, Permission, PowerUsage} from "../Chargers";
-import {User} from "../User";
-import {ErrorStateMatcher} from "@angular/material/core";
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { EaseeApiService } from "../easee-api.service";
+import { forkJoin, map, takeUntil } from 'rxjs';
+import { Charger, Permission, PowerUsage } from "../Chargers";
+import { User } from "../User";
+import { ErrorStateMatcher } from "@angular/material/core";
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
-import { allChargers } from '../ChargersWithUsers';
+import { allChargers } from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
+import { Products } from '../Products';
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -40,11 +41,13 @@ export class SecureComponent implements OnInit {
 
   timePeriodForm!: UntypedFormGroup;
   from = "";
-  to="";
+  to = "";
   currentUser = '';
   isLoadingResults = false;
   displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
   chargers: Charger[] = [];
+  personalChargers: string[] = [];
+  userRole: number = 0;
   matcher = new MyErrorStateMatcher();
 
   constructor(private authService: AuthService, private esaeeApi: EaseeApiService, private router: Router, private formBuilder: UntypedFormBuilder) { }
@@ -53,7 +56,7 @@ export class SecureComponent implements OnInit {
     this.isLoadingResults = true;
     this.authService.secured()
       .subscribe((data: User) => {
-        this.currentUser = data.firstName+" "+data.lastName;
+        this.currentUser = data.firstName + " " + data.lastName;
         this.isLoadingResults = false;
       });
 
@@ -64,15 +67,28 @@ export class SecureComponent implements OnInit {
   }
 
   onFormSubmit(): void {
-    this.from = this.timePeriodForm.value.from+"T00:00:00Z";
-    this.to = this.timePeriodForm.value.to+"T23:59:59Z";
-    this.loadData(this.from, this.to);
+    this.from = this.timePeriodForm.value.from + "T00:00:00Z";
+    this.to = this.timePeriodForm.value.to + "T23:59:59Z";
+
+    //check if we deal with a normal user or a site admin
+    this.esaeeApi.getProducts().subscribe((data: Products[]) => {
+      data[0].circuits[0].chargers.forEach((charger) => {
+        this.personalChargers.push(charger.id);
+        this.userRole = charger.userRole;
+      });
+      //load data for all or just the personal chargers
+      this.loadData(this.from, this.to);
+    });
   }
 
-  onExport():void{
+  onExport(): void {
     new AngularCsv(this.chargers, "AbrechnungLadestationen.csv", optionsForCSVExport);
   }
 
+  /**
+   * internal use only to create the chargers to users map (see: ChargersWithUsers.ts)
+   * There is a button in the html file, which is commented
+   */
   mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations
     let observables = this.chargerIDs().map((id: string) => {
@@ -92,7 +108,7 @@ export class SecureComponent implements OnInit {
   }
 
 
-  loadData(from:string, to:string): void {
+  loadData(from: string, to: string): void {
     this.isLoadingResults = true;
     let observables = this.chargerIDs().map((id: string) => {
       return this.esaeeApi.getChargerConsumption(id, from, to);
@@ -105,7 +121,7 @@ export class SecureComponent implements OnInit {
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);
-        charger.totalConsumption = charger.totalConsumptionKWhLowRate+charger.totalConsumptionKWhHighRate;
+        charger.totalConsumption = charger.totalConsumptionKWhLowRate + charger.totalConsumptionKWhHighRate;
         result.push(charger);
       });
       return result;
@@ -115,10 +131,15 @@ export class SecureComponent implements OnInit {
       this.chargers = data;
       this.isLoadingResults = false;
     });
+    //todo add error handling
   }
 
   chargerIDs(): Array<string> {
-    return allChargers.map(elem => elem.id)
+    //site admin has role == 1
+    if (this.userRole == 1) {
+      return allChargers.map(elem => elem.id)
+    }
+    return this.personalChargers;
   }
 
   logout(): void {
@@ -127,19 +148,19 @@ export class SecureComponent implements OnInit {
   }
 
   getTotalConsumptionHighRate() {
-    return this.chargers.map(charger => charger.totalConsumptionKWhHighRate).reduce((sum, value)=> sum + value, 0);
+    return this.chargers.map(charger => charger.totalConsumptionKWhHighRate).reduce((sum, value) => sum + value, 0);
   }
 
   getTotalConsumptionLowRate() {
-    return this.chargers.map(charger => charger.totalConsumptionKWhLowRate).reduce((sum, value)=> sum + value, 0);
+    return this.chargers.map(charger => charger.totalConsumptionKWhLowRate).reduce((sum, value) => sum + value, 0);
   }
 
   getTotalConsumptionEligibleForSolar() {
-    return this.chargers.map(charger => charger.totalConsumptionEligibleForSolar).reduce((sum, value)=> sum + value, 0);
+    return this.chargers.map(charger => charger.totalConsumptionEligibleForSolar).reduce((sum, value) => sum + value, 0);
   }
 
   getTotalCostInPeriod() {
-    return this.chargers.map(charger => charger.totalCostsInPeriod).reduce((sum, value)=> sum + value, 0);
+    return this.chargers.map(charger => charger.totalCostsInPeriod).reduce((sum, value) => sum + value, 0);
   }
 
   /**
@@ -238,7 +259,7 @@ function sumCosts(charger: Charger) {
         sum += entry.totalEnergy * LOW_RATE
         kWhLow += entry.totalEnergy;
       }
-      if (entry.solarPower){
+      if (entry.solarPower) {
         solarPower += entry.totalEnergy;
       }
     }

@@ -1,16 +1,16 @@
 <div class="easee-loading-shade" *ngIf="isLoadingResults">
     <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
 </div>
+<h2>Ladesationen Tièchestrasse</h2>
 <mat-card class="easee-card">
     <form [formGroup]="loginForm" (ngSubmit)="onFormSubmit()">
-        <h2>Log In</h2>
+        <h2>Log in mit Easee Login Daten</h2>
         <mat-form-field class="easee-full-width">
             <label>
                 <input matInput placeholder="Username" formControlName="username" [errorStateMatcher]="matcher">
             </label>
             <mat-error>
-                <span *ngIf="!loginForm.get('username')?.valid && loginForm.get('username')?.touched">Please enter
-                    Username</span>
+                <span *ngIf="!loginForm.get('username')?.valid && loginForm.get('username')?.touched">Bitte Easee Account Benutzername eingeben</span>
             </mat-error>
         </mat-form-field>
         <mat-form-field class="easee-full-width">
@@ -19,13 +19,12 @@
                     [errorStateMatcher]="matcher">
             </label>
             <mat-error>
-                <span *ngIf="!loginForm.get('password')?.valid && loginForm.get('password')?.touched">Please enter
-                    Password</span>
+                <span *ngIf="!loginForm.get('password')?.valid && loginForm.get('password')?.touched">Bitte Passwort eingeben</span>
             </mat-error>
         </mat-form-field>
         <div class="button-row">
             <button type="submit" [disabled]="!loginForm.valid" mat-flat-button
-                color="primary"><mat-icon>login</mat-icon>Login</button>
+                color="primary"><mat-icon>login</mat-icon>&nbsp;Login</button>
         </div>
     </form>
 </mat-card>

@@ -6,10 +6,11 @@ import { forkJoin, map, takeUntil } from 'rxjs';
 import { Charger, Permission, PowerUsage } from "../Chargers";
 import { User } from "../User";
 import { ErrorStateMatcher } from "@angular/material/core";
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators, FormControl } from '@angular/forms';
 import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
 import { allChargers } from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
 import { Products } from '../Products';
+import { validateDateNotInFuture } from '../date-validator.directive';
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -62,7 +63,10 @@ export class SecureComponent implements OnInit {
 
     this.timePeriodForm = this.formBuilder.group({
       from: [null, Validators.required],
-      to: [null, Validators.required]
+      to: new FormControl(this.to, [
+        Validators.required,
+        validateDateNotInFuture()
+      ])
     });
   }
 

@@ -1,16 +1,25 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { AuthService } from '../auth.service';
-import { Router } from '@angular/router';
-import { EaseeApiService } from "../easee-api.service";
-import { forkJoin, map, takeUntil } from 'rxjs';
-import { Charger, Permission, PowerUsage } from "../Chargers";
-import { User } from "../User";
-import { ErrorStateMatcher } from "@angular/material/core";
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, FormGroupDirective, NgForm, Validators, FormControl } from '@angular/forms';
-import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
-import { allChargers } from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
-import { Products } from '../Products';
-import { validateDateNotInFuture } from '../date-validator.directive';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
+import {AuthService} from '../auth.service';
+import {Router} from '@angular/router';
+import {EaseeApiService} from "../easee-api.service";
+import {forkJoin, map} from 'rxjs';
+import {Charger, Permission, PowerUsage} from "../Chargers";
+import {User} from "../User";
+import {ErrorStateMatcher} from "@angular/material/core";
+import {
+  FormControl,
+  FormGroupDirective,
+  NgForm,
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+  Validators
+} from '@angular/forms';
+import {AngularCsv} from 'angular-csv-ext/dist/Angular-csv';
+import {allChargers} from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
+import {Products} from '../Products';
+import {validateDateNotInFuture} from '../date-validator.directive';
+import {NotificationService} from "../NotificationSerivce";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -41,17 +50,21 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 export class SecureComponent implements OnInit {
 
   timePeriodForm!: UntypedFormGroup;
-  from = "";
-  to = "";
+  from: Date = new Date(0);
+  to: Date = new Date(0);
+  toInLocalTime: Date = new Date(0);
   currentUser = '';
-  isLoadingResults = false;
+  isLoadingResults: boolean = false;
   displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
   chargers: Charger[] = [];
   personalChargers: string[] = [];
   userRole: number = 0;
   matcher = new MyErrorStateMatcher();
 
-  constructor(private authService: AuthService, private esaeeApi: EaseeApiService, private router: Router, private formBuilder: UntypedFormBuilder) { }
+  constructor(private authService: AuthService, private esaeeApi: EaseeApiService,
+              private router: Router,
+              private formBuilder: UntypedFormBuilder,
+              private notifications: NotificationService) { }
 
   ngOnInit(): void {
     this.isLoadingResults = true;
@@ -62,7 +75,10 @@ export class SecureComponent implements OnInit {
       });
 
     this.timePeriodForm = this.formBuilder.group({
-      from: [null, Validators.required],
+      from: new FormControl(this.to, [
+        Validators.required,
+        validateDateNotInFuture()
+      ]),
       to: new FormControl(this.to, [
         Validators.required,
         validateDateNotInFuture()
@@ -71,8 +87,14 @@ export class SecureComponent implements OnInit {
   }
 
   onFormSubmit(): void {
-    this.from = this.timePeriodForm.value.from + "T00:00:00Z";
-    this.to = this.timePeriodForm.value.to + "T23:59:59Z";
+    this.from = new Date(this.timePeriodForm.value.from + "T00:00:00Z");
+    this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
+    console.log(this.to);
+    let substract = this.to.getTimezoneOffset()*60*1000*-1;
+    console.log(substract);
+    this.toInLocalTime = new Date(this.to.getTime() - substract);
+    console.log(this.toInLocalTime);
+
 
     //check if we deal with a normal user or a site admin
     this.esaeeApi.getProducts().subscribe((data: Products[]) => {
@@ -81,12 +103,12 @@ export class SecureComponent implements OnInit {
         this.userRole = charger.userRole;
       });
       //load data for all or just the personal chargers
-      this.loadData(this.from, this.to);
+      this.loadData(this.from.toISOString(), this.to.toISOString());
     });
   }
 
   onExport(): void {
-    new AngularCsv(this.chargers, "AbrechnungLadestationen.csv", optionsForCSVExport);
+    new AngularCsv(this.chargers, "AbrechnungLadestationen", optionsForCSVExport);
   }
 
   /**
@@ -129,13 +151,26 @@ export class SecureComponent implements OnInit {
         result.push(charger);
       });
       return result;
-    })).subscribe((data) => {
-      data = data.sort(sortChargersByPPNumber);
-      data = data.filter(data => data.totalCostsInPeriod > 0);
-      this.chargers = data;
-      this.isLoadingResults = false;
+    })).subscribe({
+      next: (data) => this.handleData(data),
+      error: (e) => this.handleError(e),
+      complete: () => console.info('complete')
     });
-    //todo add error handling
+  }
+
+  handleData(data: Charger[]) {
+    data = data.sort(sortChargersByPPNumber);
+    data = data.filter(data => data.totalCostsInPeriod > 0);
+    if (data.length == 0) {
+      this.notifications.showError("Keine Daten gefunden. Stimmt die Zeitperiode?");
+    }
+    this.chargers = data;
+    this.isLoadingResults = false;
+  }
+
+  handleError(e: any) {
+    this.notifications.showError(e);
+    this.isLoadingResults = false;
   }
 
   chargerIDs(): Array<string> {
@@ -167,13 +202,6 @@ export class SecureComponent implements OnInit {
     return this.chargers.map(charger => charger.totalCostsInPeriod).reduce((sum, value) => sum + value, 0);
   }
 
-  /**
-   * todo: delete if mat table works
-   * @param permissions
-   */
-  getUsers(permissions: Permission[]) {
-    return permissions.map(entry => entry.name).join(",");
-  }
 }
 
 function getUsers(permissions: Permission[]) {

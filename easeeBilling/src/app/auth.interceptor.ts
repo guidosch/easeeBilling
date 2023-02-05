@@ -1,17 +1,26 @@
-import { Injectable } from '@angular/core';
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { throwError } from 'rxjs';
-import { TokenService } from './token.service';
-import { catchError, map } from 'rxjs/operators';
-import { AuthService } from './auth.service';
+import {Injectable} from '@angular/core';
+import {
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse
+} from '@angular/common/http';
+import {Router} from '@angular/router';
+import {throwError} from 'rxjs';
+import {TokenService} from './token.service';
+import {catchError, map} from 'rxjs/operators';
+import {AuthService} from './auth.service';
+import {NotificationService} from "./NotificationSerivce";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
     private tokenService: TokenService,
-    private authService: AuthService) {
+    private authService: AuthService,
+    private notification: NotificationService) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): any {
@@ -58,6 +67,7 @@ export class AuthInterceptor implements HttpInterceptor {
             this.router.navigate(['login']).then(_ => console.log('redirect to login'));
           }
         }
+        this.notification.showError(error.error.title)
         return throwError(() => new Error("Request failed..."));
       }));
   }

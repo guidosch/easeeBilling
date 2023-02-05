@@ -4,7 +4,7 @@
 
     <mat-grid-list cols="2" rowHeight="3:1">
       <mat-grid-tile>
-        <h2>Abrechnung Ladestationen <span *ngIf="from.length > 0">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{to| date:'mediumDate'}})</span></h2>
+        <h2>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span *ngIf="from.getTime() > 1">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{toInLocalTime| date:'mediumDate'}})</span></h2>
         <div style="display: block">
           <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
             <mat-form-field class="easee-full-width">

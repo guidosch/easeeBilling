@@ -1,4 +1,4 @@
-# easeeBilling
-Charging stations billing with low and high rates for electricity based on hourly data from Easee cloud API (https://developer.easee.cloud/).
+# EaseeBilling
 
-You need a site admin account to access all charging stations in your site.
+Angular project which connects to the easee.cloud API to fetch hourly data.
+

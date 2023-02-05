@@ -2,6 +2,7 @@
 src/app/ChargersWithUsers.ts
 
 # compiled output
+/dist
 /tmp
 /out-tsc
 # Only exists if Bazel was run

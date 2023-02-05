@@ -89,11 +89,8 @@ export class SecureComponent implements OnInit {
   onFormSubmit(): void {
     this.from = new Date(this.timePeriodForm.value.from + "T00:00:00Z");
     this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
-    console.log(this.to);
     let substract = this.to.getTimezoneOffset()*60*1000*-1;
-    console.log(substract);
     this.toInLocalTime = new Date(this.to.getTime() - substract);
-    console.log(this.toInLocalTime);
 
 
     //check if we deal with a normal user or a site admin

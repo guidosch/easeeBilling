@@ -66,6 +66,11 @@ export class AuthInterceptor implements HttpInterceptor {
           } else {
             this.router.navigate(['login']).then(_ => console.log('redirect to login'));
           }
+        } else if(error.status === 400) {
+          //normally means that the time range is too large
+          console.log(error.error)
+          this.notification.showError(error.error)
+          return throwError(() => new Error("Interval zu gross..."));
         }
         this.notification.showError(error.error.title)
         return throwError(() => new Error("Request failed..."));

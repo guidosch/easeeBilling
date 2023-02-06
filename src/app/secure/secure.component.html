@@ -4,41 +4,45 @@
 
     <mat-grid-list cols="2" rowHeight="3:1">
       <mat-grid-tile>
-        <h2>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span *ngIf="from.getTime() > 1">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{toInLocalTime| date:'mediumDate'}})</span></h2>
+        <h2>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span
+            *ngIf="from.getTime() > 1">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{toInLocalTime|
+            date:'mediumDate'}})</span></h2>
         <div style="display: block">
           <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
             <mat-form-field class="easee-full-width">
               <label>
                 <input [errorStateMatcher]="matcher" formControlName="from" matInput
-                       placeholder="Start Abrechnungszeitraum"
-                       type="date">
+                  placeholder="Start Abrechnungszeitraum" type="date">
               </label>
               <mat-error>
-                <span *ngIf="!timePeriodForm.get('from')?.valid && timePeriodForm.get('from')?.touched">Abrechnungsperiode Start (Datum) eingeben</span>
+                <span
+                  *ngIf="!timePeriodForm.get('from')?.valid && timePeriodForm.get('from')?.touched">Abrechnungsperiode
+                  Start (Datum) eingeben</span>
               </mat-error>
             </mat-form-field>
             <mat-form-field class="easee-full-width">
               <label>
                 <input [errorStateMatcher]="matcher" formControlName="to" matInput
-                       placeholder="Ende Abrechnungszeitraum"
-                       type="date">
+                  placeholder="Ende Abrechnungszeitraum" type="date">
               </label>
               <mat-error>
                 <span *ngIf="!timePeriodForm.get('to')?.valid && timePeriodForm.get('to')?.touched">
-                    Abrechnungsperiode Ende (Datum) eingeben</span>
+                  Abrechnungsperiode Ende (Datum) eingeben</span>
               </mat-error>
             </mat-form-field>
             <span class="button-row">
-      <button [disabled]="!timePeriodForm.valid" color="primary" mat-flat-button
+              <button [disabled]="!timePeriodForm.valid" color="primary" mat-flat-button
               type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
-    </span>
+            </span>
           </form>
+          <div style="margin-top: 1%;">* Wenn das Interval grösser als 31 Tage ist, dann wird eine Fehlermeldung ausgegeben.</div>
         </div>
       </mat-grid-tile>
       <mat-grid-tile style="display: block">
         <div style="float: right">
           <span style="margin-right: 5px">{{currentUser}}</span>
-          <span class="button-row"><a (click)="logout()" color="primary" mat-flat-button><mat-icon>logout</mat-icon>Logout</a></span>
+          <span class="button-row"><a (click)="logout()" color="primary"
+              mat-flat-button><mat-icon>logout</mat-icon>Logout</a></span>
         </div>
 
       </mat-grid-tile>
@@ -65,37 +69,36 @@
         <ng-container matColumnDef="totalConsumption">
           <th *matHeaderCellDef mat-header-cell> Total kWh</th>
           <td *matCellDef="let charger" mat-cell> {{charger.totalConsumption | number: '1.0-2'}} </td>
-          <td *matFooterCellDef
-              mat-footer-cell> {{getTotalConsumptionHighRate() + getTotalConsumptionLowRate()  | number: '1.0-2'}} </td>
+          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionHighRate() + getTotalConsumptionLowRate() |
+            number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total kWh Niedertarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhLowRate">
           <th *matHeaderCellDef mat-header-cell> Total kWh Niedertarif</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhLowRate | number: '1.0-2'}} </td>
-          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionLowRate()  | number: '1.0-2'}} </td>
+          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionLowRate() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total kWh Hochtarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhHighRate">
           <th *matHeaderCellDef mat-header-cell> Total kWh Hochtarif</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhHighRate | number: '1.0-2'}} </td>
-          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionHighRate()  | number: '1.0-2'}} </td>
+          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionHighRate() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total kWh Solar el Column -->
         <ng-container matColumnDef="totalConsumptionEligibleForSolar">
           <th *matHeaderCellDef mat-header-cell> Total kWh Solarertrag</th>
-          <td *matCellDef="let charger"
-              mat-cell> {{ charger.totalConsumptionEligibleForSolar | number: '1.0-2'}} </td>
-          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionEligibleForSolar()  | number: '1.0-2'}} </td>
+          <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionEligibleForSolar | number: '1.0-2'}} </td>
+          <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionEligibleForSolar() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total cost Column -->
         <ng-container matColumnDef="totalCostsInPeriod">
           <th *matHeaderCellDef mat-header-cell> Total Kosten in CHF</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalCostsInPeriod | number: '1.0-2'}} </td>
-          <td *matFooterCellDef mat-footer-cell> {{getTotalCostInPeriod()  | number: '1.0-2'}} </td>
+          <td *matFooterCellDef mat-footer-cell> {{getTotalCostInPeriod() | number: '1.0-2'}} </td>
         </ng-container>
 
         <tr *matHeaderRowDef="displayedColumns" mat-header-row></tr>
@@ -107,7 +110,8 @@
 
   </div>
 
-  <div style="padding-top: 20px" *ngIf="chargers.length> 0"><span class="button-row"><a (click)="onExport()" color="primary" mat-flat-button><mat-icon>download</mat-icon>Export als CSV</a></span></div>
+  <div style="padding-top: 20px" *ngIf="chargers.length> 0"><span class="button-row"><a (click)="onExport()"
+        color="primary" mat-flat-button><mat-icon>download</mat-icon>Export als CSV</a></span></div>
 
   <div *ngIf="isLoadingResults" class="example-loading-shade">
     <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
@@ -119,5 +123,3 @@
 
 
 </div>
-
-

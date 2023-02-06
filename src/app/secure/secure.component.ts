@@ -1,11 +1,11 @@
-import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {AuthService} from '../auth.service';
-import {Router} from '@angular/router';
-import {EaseeApiService} from "../easee-api.service";
-import {forkJoin, map} from 'rxjs';
-import {Charger, Permission, PowerUsage} from "../Chargers";
-import {User} from "../User";
-import {ErrorStateMatcher} from "@angular/material/core";
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { AuthService } from '../auth.service';
+import { Router } from '@angular/router';
+import { EaseeApiService } from "../easee-api.service";
+import { forkJoin, map } from 'rxjs';
+import { Charger, Permission, PowerUsage } from "../Chargers";
+import { User } from "../User";
+import { ErrorStateMatcher } from "@angular/material/core";
 import {
   FormControl,
   FormGroupDirective,
@@ -15,11 +15,12 @@ import {
   UntypedFormGroup,
   Validators
 } from '@angular/forms';
-import {AngularCsv} from 'angular-csv-ext/dist/Angular-csv';
-import {allChargers} from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
-import {Products} from '../Products';
-import {validateDateNotInFuture} from '../date-validator.directive';
-import {NotificationService} from "../NotificationSerivce";
+import { AngularCsv } from 'angular-csv-ext/dist/Angular-csv';
+import { allChargers } from '../ChargersWithUsers'; //not in git due to security reasons. Generate file or copy from imac@home
+import { Products } from '../Products';
+import { validateDateNotInFuture } from '../date-validator.directive';
+import { NotificationService } from "../NotificationSerivce";
+import * as dayjs from 'dayjs'
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -62,9 +63,9 @@ export class SecureComponent implements OnInit {
   matcher = new MyErrorStateMatcher();
 
   constructor(private authService: AuthService, private esaeeApi: EaseeApiService,
-              private router: Router,
-              private formBuilder: UntypedFormBuilder,
-              private notifications: NotificationService) { }
+    private router: Router,
+    private formBuilder: UntypedFormBuilder,
+    private notifications: NotificationService) { }
 
   ngOnInit(): void {
     this.isLoadingResults = true;
@@ -89,8 +90,11 @@ export class SecureComponent implements OnInit {
   onFormSubmit(): void {
     this.from = new Date(this.timePeriodForm.value.from + "T00:00:00Z");
     this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
-    let substract = this.to.getTimezoneOffset()*60*1000*-1;
+    let substract = this.to.getTimezoneOffset() * 60 * 1000 * -1;
     this.toInLocalTime = new Date(this.to.getTime() - substract);
+
+    console.log("time diff: "+dayjs(this.to).diff(this.from, 'day'));
+
 
 
     //check if we deal with a normal user or a site admin
@@ -110,7 +114,7 @@ export class SecureComponent implements OnInit {
 
   /**
    * internal use only to create the chargers to users map (see: ChargersWithUsers.ts)
-   * There is a button in the html file, which is commented
+   * There is a button in the html file, which is commented. Run this command if you have new users or changes.
    */
   mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations
@@ -140,7 +144,7 @@ export class SecureComponent implements OnInit {
     forkJoin(observables).pipe(map(response => {
       //array map where the index serves as lookup for the corresponding charger object which is in same order
       response.map((powerUsage: PowerUsage[], index: number) => {
-        let charger = allChargers[index];
+        let charger = this.getCharger(index);
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);
@@ -153,6 +157,13 @@ export class SecureComponent implements OnInit {
       error: (e) => this.handleError(e),
       complete: () => console.info('complete')
     });
+  }
+
+  getCharger(index: number): Charger {
+    if (this.userRole == 1) {
+      return allChargers[index];
+    }
+    return allChargers.filter(charger => charger.id == this.personalChargers[0])[0];
   }
 
   handleData(data: Charger[]) {

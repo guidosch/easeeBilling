@@ -1,60 +1,63 @@
+<mat-toolbar>
+  <span>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span *ngIf="from.getTime() > 1">(Nutzungdauer
+      von {{from | date:'mediumDate'}} bis {{toInLocalTime|
+      date:'mediumDate'}})</span></span>
+  <span class="example-spacer"></span>
+  <span class="example-spacer"></span>
+  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
+    <mat-icon>favorite</mat-icon>
+  </button>
+
+  <div style="float: right">
+    <span style="margin-right: 5px">{{currentUser}}</span>
+    <span class="button-row"><a (click)="logout()" color="primary"
+        mat-flat-button><mat-icon>logout</mat-icon>Logout</a></span>
+  </div>
+</mat-toolbar>
+
 <div class="container">
 
   <div class="">
 
-    <mat-grid-list cols="2" rowHeight="3:1">
-      <mat-grid-tile>
-        <h2>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span
-            *ngIf="from.getTime() > 1">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{toInLocalTime|
-            date:'mediumDate'}})</span></h2>
 
-        <div style="display: block">
-          <!--
-          <mat-chip-set><mat-chip>test</mat-chip></mat-chip-set>
-          -->
-        <div>...or...</div>
-          <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
-            <mat-form-field class="easee-full-width">
-              <label>
-                <input [errorStateMatcher]="matcher" formControlName="from" matInput
-                  placeholder="Start Abrechnungszeitraum" type="date">
-              </label>
-              <mat-error>
-                <span
-                  *ngIf="!timePeriodForm.get('from')?.valid && timePeriodForm.get('from')?.touched">Abrechnungsperiode
-                  Start (Datum) eingeben</span>
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field class="easee-full-width">
-              <label>
-                <input [errorStateMatcher]="matcher" formControlName="to" matInput
-                  placeholder="Ende Abrechnungszeitraum" type="date">
-              </label>
-              <mat-error>
-                <span *ngIf="!timePeriodForm.get('to')?.valid && timePeriodForm.get('to')?.touched">
-                  Abrechnungsperiode Ende (Datum) eingeben</span>
-              </mat-error>
-            </mat-form-field>
-            <span class="button-row">
-              <button [disabled]="!timePeriodForm.valid" color="primary" mat-flat-button
-              type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
-            </span>
-          </form>
-          <div style="margin-top: 1%;">* Wenn das Interval grösser als 31 Tage ist, dann wird eine Fehlermeldung ausgegeben.</div>
-        </div>
-      </mat-grid-tile>
-     
+    <div style="display: block">
+      <mat-chip-listbox aria-label="Timerange selection" [multiple]="true" [selectable]="true">
+        <mat-chip-option *ngFor="let chip of chips" [selected]="chip.state" (selectionChange)="changeSelected(chip)" (click)="chip.state=!chip.state">{{chip.name}}</mat-chip-option>
+      </mat-chip-listbox>
 
-      <mat-grid-tile style="display: block">
-        <div style="float: right">
-          <span style="margin-right: 5px">{{currentUser}}</span>
-          <span class="button-row"><a (click)="logout()" color="primary"
-              mat-flat-button><mat-icon>logout</mat-icon>Logout</a></span>
-        </div>
+      <div>...or...</div>
+      
+      <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
+        <mat-form-field class="easee-full-width">
+          <label>
+            <input [errorStateMatcher]="matcher" formControlName="from" matInput placeholder="Start Abrechnungszeitraum"
+              type="date">
+          </label>
+          <mat-error>
+            <span *ngIf="!timePeriodForm.get('from')?.valid && timePeriodForm.get('from')?.touched">Abrechnungsperiode
+              Start (Datum) eingeben</span>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="easee-full-width">
+          <label>
+            <input [errorStateMatcher]="matcher" formControlName="to" matInput placeholder="Ende Abrechnungszeitraum"
+              type="date">
+          </label>
+          <mat-error>
+            <span *ngIf="!timePeriodForm.get('to')?.valid && timePeriodForm.get('to')?.touched">
+              Abrechnungsperiode Ende (Datum) eingeben</span>
+          </mat-error>
+        </mat-form-field>
+        <span class="button-row">
+          <button [disabled]="!timePeriodForm.valid || !timePeriodForm.get('to')?.touched" color="primary" mat-flat-button
+            type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
+        </span>
+      </form>
+      <div style="margin-top: 1%;">* Wenn das Interval grösser als 31 Tage ist, dann wird eine Fehlermeldung ausgegeben.
+      </div>
+    </div>
 
-      </mat-grid-tile>
 
-    </mat-grid-list>
 
     <!-- billing overview table -->
     <div *ngIf="chargers.length > 0">

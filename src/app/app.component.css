@@ -1,63 +1,49 @@
-  .container {
+.container {
     padding: 20px;
-  }
+}
 
-  mat-grid-tile {
-    display: block  !important;
-    justify-content: unset !important;
-  }
 
-  .mat-grid-tile-content {
-    display: block  !important;
-    justify-content: unset !important;
-  }
-
-  main {
-    display: block;
-    justify-content: unset;
-  }
-
-  .easee-container {
+.easee-container {
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+}
 
-  .easee-card {
+.easee-card {
     min-width: 150px;
     max-width: 300px;
     width: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
-  }
 
-  .easee-full-width {
+}
+
+.easee-full-width {
     width: 100%;
-  }
+}
 
-  .easee-full-width:nth-last-child(0) {
+.easee-full-width:nth-last-child(0) {
     margin-bottom: 10px;
-  }
+}
 
-  .button-row {
-    margin: 10px 0;
-    /*
-    mat-icon {
-      margin-right: 10px
-    }*/
-  }
+input.mat-mdc-input-element::-webkit-calendar-picker-indicator {
+    display: block;
+}
 
-  .mat-flat-button {
+.mat-mdc-unelevated-button {
     margin: 5px;
-  }
+}
 
-  tr.mat-footer-row td {
+tr.mat-mdc-footer-row td {
     font-weight: bold;
-  }
+}
 
-  table {
+table {
     width: 100%;
-  }
+}
 
+.example-spacer {
+    flex: 1 1 auto;
+  }

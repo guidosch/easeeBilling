@@ -48,7 +48,15 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   styleUrls: ['../app.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class SecureComponent implements OnInit {
+export class SecureComponent implements OnInit { 
+
+  chips = [
+    {name: 'Februar', state:false},
+    {name: 'March', state:false},
+    {name: 'April', state:false}
+  ];
+
+  chipsSelected: any[]= [];
 
   timePeriodForm!: UntypedFormGroup;
   from: Date = new Date(0);
@@ -96,6 +104,10 @@ export class SecureComponent implements OnInit {
       //load data for all or just the personal chargers
     });
 
+  }
+
+  changeSelected(chip: any): void {
+    this.chipsSelected.push(chip);
   }
 
   onFormSubmit(): void {

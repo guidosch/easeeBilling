@@ -23,6 +23,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatFormFieldModule,
     MatGridListModule,
     MatSnackBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatToolbarModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

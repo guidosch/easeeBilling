@@ -57,6 +57,7 @@ export class SecureComponent implements OnInit {
   currentUser = '';
   isLoadingResults: boolean = false;
   displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
+  //data for table
   chargers: Charger[] = [];
   personalChargers: string[] = [];
   userRole: number = 0;
@@ -85,17 +86,6 @@ export class SecureComponent implements OnInit {
         validateDateNotInFuture()
       ])
     });
-  }
-
-  onFormSubmit(): void {
-    this.from = new Date(this.timePeriodForm.value.from + "T00:00:00Z");
-    this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
-    let substract = this.to.getTimezoneOffset() * 60 * 1000 * -1;
-    this.toInLocalTime = new Date(this.to.getTime() - substract);
-
-    console.log("time diff: "+dayjs(this.to).diff(this.from, 'day'));
-
-
 
     //check if we deal with a normal user or a site admin
     this.esaeeApi.getProducts().subscribe((data: Products[]) => {
@@ -104,8 +94,18 @@ export class SecureComponent implements OnInit {
         this.userRole = charger.userRole;
       });
       //load data for all or just the personal chargers
-      this.loadData(this.from.toISOString(), this.to.toISOString());
     });
+
+  }
+
+  onFormSubmit(): void {
+    this.from = new Date(this.timePeriodForm.value.from + "T00:00:00Z");
+    this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
+    let substract = this.to.getTimezoneOffset() * 60 * 1000 * -1;
+    this.toInLocalTime = new Date(this.to.getTime() - substract);
+    console.log("time diff: "+dayjs(this.to).diff(this.from, 'day'));
+
+    this.loadData(this.from.toISOString(), this.to.toISOString());
   }
 
   onExport(): void {
@@ -160,7 +160,7 @@ export class SecureComponent implements OnInit {
   }
 
   getCharger(index: number): Charger {
-    if (this.userRole == 1) {
+    if (this.userRole == 1) { //user role 1 is site admin
       return allChargers[index];
     }
     return allChargers.filter(charger => charger.id == this.personalChargers[0])[0];
@@ -182,8 +182,7 @@ export class SecureComponent implements OnInit {
   }
 
   chargerIDs(): Array<string> {
-    //site admin has role == 1
-    if (this.userRole == 1) {
+    if (this.userRole == 1) { //user role 1 is site admin
       return allChargers.map(elem => elem.id)
     }
     return this.personalChargers;

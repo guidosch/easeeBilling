@@ -7,7 +7,12 @@
         <h2>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span
             *ngIf="from.getTime() > 1">(Nutzungdauer von {{from | date:'mediumDate'}} bis {{toInLocalTime|
             date:'mediumDate'}})</span></h2>
+
         <div style="display: block">
+          <!--
+          <mat-chip-set><mat-chip>test</mat-chip></mat-chip-set>
+          -->
+        <div>...or...</div>
           <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
             <mat-form-field class="easee-full-width">
               <label>
@@ -38,6 +43,8 @@
           <div style="margin-top: 1%;">* Wenn das Interval grösser als 31 Tage ist, dann wird eine Fehlermeldung ausgegeben.</div>
         </div>
       </mat-grid-tile>
+     
+
       <mat-grid-tile style="display: block">
         <div style="float: right">
           <span style="margin-right: 5px">{{currentUser}}</span>
@@ -46,6 +53,7 @@
         </div>
 
       </mat-grid-tile>
+
     </mat-grid-list>
 
     <!-- billing overview table -->

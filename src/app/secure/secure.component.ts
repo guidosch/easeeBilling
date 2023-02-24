@@ -21,6 +21,7 @@ import { Products } from '../Products';
 import { validateDateNotInFuture } from '../date-validator.directive';
 import { NotificationService } from "../NotificationSerivce";
 import * as dayjs from 'dayjs'
+import * as _ from "lodash";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -31,7 +32,7 @@ var optionsForCSVExport = {
   showLabels: true,
   showTitle: true,
   title: 'Abrechnung Ladestationen Tiechestrasse',
-  headers: ["name", "users", "totalCostsInPeriod"],
+  headers: ["name", "users", "totalConsumptionKWhHighRate", "totalConsumptionKWhLowRate", "totalConsumptionEligibleForSolar", "totalCostsInPeriod"],
   useHeader: true,
 };
 
@@ -42,21 +43,19 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
   }
 }
 
+interface Chip {
+  name: string, state: boolean, month: number, year: number
+}
+
 @Component({
   selector: 'app-secure',
   templateUrl: './secure.component.html',
   styleUrls: ['../app.component.css'],
   encapsulation: ViewEncapsulation.None
 })
-export class SecureComponent implements OnInit { 
+export class SecureComponent implements OnInit {
 
-  chips = [
-    {name: 'Februar', state:false},
-    {name: 'March', state:false},
-    {name: 'April', state:false}
-  ];
-
-  chipsSelected: any[]= [];
+  chips: Chip[] = [];
 
   timePeriodForm!: UntypedFormGroup;
   from: Date = new Date(0);
@@ -70,6 +69,7 @@ export class SecureComponent implements OnInit {
   personalChargers: string[] = [];
   userRole: number = 0;
   matcher = new MyErrorStateMatcher();
+  timeDiffInDays: number = 0;
 
   constructor(private authService: AuthService, private esaeeApi: EaseeApiService,
     private router: Router,
@@ -77,6 +77,7 @@ export class SecureComponent implements OnInit {
     private notifications: NotificationService) { }
 
   ngOnInit(): void {
+    this.fillChips();
     this.isLoadingResults = true;
     this.authService.secured()
       .subscribe((data: User) => {
@@ -105,9 +106,26 @@ export class SecureComponent implements OnInit {
     });
 
   }
+  fillChips() {
+    let now = dayjs().date(15);
+    for (let i = 0; i < 6; i++) {
+      let temp = now.subtract(i, "month");
+      let month = { name: temp.format("MMMM"), state: false, month: temp.month(), year: temp.year() };
+      this.chips.push(month);
+    }
+  }
 
-  changeSelected(chip: any): void {
-    this.chipsSelected.push(chip);
+  resetChips() {
+    this.chips = [];
+    this.fillChips();
+  }
+
+  changeSelected(chip: Chip): void {
+    let dateTime = dayjs().set('month', chip.month).set('year', chip.year);
+    let start = dateTime.set('date', 1).set('hour', 0).set('minute', 0);
+    let end = dateTime.set('date', dateTime.daysInMonth()).set('hour', 23).set('minute', 59);
+
+    this.loadData(start.toISOString(), end.toISOString());
   }
 
   onFormSubmit(): void {
@@ -115,7 +133,7 @@ export class SecureComponent implements OnInit {
     this.to = new Date(this.timePeriodForm.value.to + "T23:59:59Z");
     let substract = this.to.getTimezoneOffset() * 60 * 1000 * -1;
     this.toInLocalTime = new Date(this.to.getTime() - substract);
-    console.log("time diff: "+dayjs(this.to).diff(this.from, 'day'));
+    this.timeDiffInDays = dayjs(this.to).diff(this.from, 'day');
 
     this.loadData(this.from.toISOString(), this.to.toISOString());
   }
@@ -156,7 +174,8 @@ export class SecureComponent implements OnInit {
     forkJoin(observables).pipe(map(response => {
       //array map where the index serves as lookup for the corresponding charger object which is in same order
       response.map((powerUsage: PowerUsage[], index: number) => {
-        let charger = this.getCharger(index);
+        //clone charger object otherwise we change the same ref. and overwrite data
+        let charger = _.cloneDeep(this.getCharger(index));
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);
@@ -182,9 +201,28 @@ export class SecureComponent implements OnInit {
     data = data.sort(sortChargersByPPNumber);
     data = data.filter(data => data.totalCostsInPeriod > 0);
     if (data.length == 0) {
-      this.notifications.showError("Keine Daten gefunden. Stimmt die Zeitperiode?");
+      this.notifications.showError("Keine Daten gefunden für diese Zeitpriode.");
+    } else {
+
+      //if we already have data we just sum up to the existing charger
+      if (this.chargers.length > 0) {
+
+        for (let index = 0; index < this.chargers.length; index++) {
+          const charger = this.chargers[index];
+          if (data.filter(elem => elem.id === charger.id).length > 0) {
+            let chargerData = data.filter(elem => elem.id === charger.id)[0];
+            charger.totalConsumption += chargerData.totalConsumption;
+            charger.totalConsumptionEligibleForSolar += chargerData.totalConsumptionEligibleForSolar;
+            charger.totalConsumptionKWhHighRate += chargerData.totalConsumptionKWhHighRate;
+            charger.totalConsumptionKWhLowRate += chargerData.totalConsumptionKWhLowRate;
+            charger.totalCostsInPeriod += chargerData.totalCostsInPeriod;
+          }
+
+        }
+      } else {
+        this.chargers = data;
+      }
     }
-    this.chargers = data;
     this.isLoadingResults = false;
   }
 
@@ -219,6 +257,11 @@ export class SecureComponent implements OnInit {
 
   getTotalCostInPeriod() {
     return this.chargers.map(charger => charger.totalCostsInPeriod).reduce((sum, value) => sum + value, 0);
+  }
+
+  reset() {
+    this.chargers = [];
+    this.resetChips();
   }
 
 }
@@ -319,5 +362,9 @@ function sumCosts(charger: Charger) {
   charger.totalConsumptionKWhLowRate = kWhLow;
   charger.totalCostsInPeriod = sum;
   charger.totalConsumptionEligibleForSolar = solarPower;
+}
+
+function mergeById(value: Charger, index: number, array: Charger[]): unknown {
+  throw new Error('Function not implemented.');
 }
 

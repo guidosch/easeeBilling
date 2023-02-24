@@ -1,16 +1,26 @@
-<div class="easee-loading-shade" *ngIf="isLoadingResults">
-    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
-</div>
-<h2>Ladesationen Tièchestrasse</h2>
+<mat-toolbar>
+    <span>Abrechnung Ladestationen Tièchestrasse (Login mit <a href="https://easee.cloud/" target="_blank">Easee
+            Account</a> Login Daten)</span>
+    <span class="example-spacer"></span>
+    <span class="example-spacer"></span>
+    <a href="https://github.com/guidosch/easeeBilling" target="_blank">
+        <button mat-icon-button class="example-icon favorite-icon" aria-label="Link to Githup project"
+            #tooltip="matTooltip"
+            matTooltip="Open source project by Guido Schnider. Click to see source code hosted on Github."
+            matTooltipHideDelay="100000">
+            <mat-icon>public</mat-icon>
+        </button></a>
+</mat-toolbar>
+
 <mat-card appearance="outlined" class="easee-card">
     <form [formGroup]="loginForm" (ngSubmit)="onFormSubmit()">
-        <h2>Log in mit Easee Login Daten</h2>
         <mat-form-field class="easee-full-width">
             <label>
                 <input matInput placeholder="Username" formControlName="username" [errorStateMatcher]="matcher">
             </label>
             <mat-error>
-                <span *ngIf="!loginForm.get('username')?.valid && loginForm.get('username')?.touched">Bitte Easee Account Benutzername eingeben</span>
+                <span *ngIf="!loginForm.get('username')?.valid && loginForm.get('username')?.touched">Bitte Easee
+                    Account Benutzername eingeben</span>
             </mat-error>
         </mat-form-field>
         <mat-form-field class="easee-full-width">
@@ -19,7 +29,8 @@
                     [errorStateMatcher]="matcher">
             </label>
             <mat-error>
-                <span *ngIf="!loginForm.get('password')?.valid && loginForm.get('password')?.touched">Bitte Passwort eingeben</span>
+                <span *ngIf="!loginForm.get('password')?.valid && loginForm.get('password')?.touched">Bitte Passwort
+                    eingeben</span>
             </mat-error>
         </mat-form-field>
         <div class="button-row">
@@ -28,6 +39,7 @@
         </div>
     </form>
 </mat-card>
-<!--todo: add link to githup source code. -->
-<mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="home"></mat-icon>
 
+<div class="easee-loading-shade" *ngIf="isLoadingResults">
+    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+</div>

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {
   HttpErrorResponse,
   HttpEvent,
@@ -7,12 +7,12 @@ import {
   HttpRequest,
   HttpResponse
 } from '@angular/common/http';
-import {Router} from '@angular/router';
-import {throwError} from 'rxjs';
-import {TokenService} from './token.service';
-import {catchError, map} from 'rxjs/operators';
-import {AuthService} from './auth.service';
-import {NotificationService} from "./NotificationSerivce";
+import { Router } from '@angular/router';
+import { throwError } from 'rxjs';
+import { TokenService } from './token.service';
+import { catchError, map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
+import { NotificationService } from "./NotificationSerivce";
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -66,11 +66,19 @@ export class AuthInterceptor implements HttpInterceptor {
           } else {
             this.router.navigate(['login']).then(_ => console.log('redirect to login'));
           }
-        } else if(error.status === 400) {
-          //normally means that the time range is too large
-          console.log(error.error)
-          this.notification.showError(error.error)
-          return throwError(() => new Error("Interval zu gross..."));
+        } else if (error.status === 400) {
+          let customError = error as any;
+          if (customError.error.errorCode === 100) {
+            //wrong username or pw
+            console.log(customError.error.title)
+            this.notification.showError(customError.error.title)
+            return throwError(() => new Error(customError.error.title));
+          } else {
+            //normally means that the time range is too large
+            console.log(error.error)
+            this.notification.showError(error.error)
+            return throwError(() => new Error("Interval zu gross..."));
+          }
         }
         this.notification.showError(error.error.title)
         return throwError(() => new Error("Request failed..."));

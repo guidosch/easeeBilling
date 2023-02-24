@@ -4,9 +4,15 @@
       date:'mediumDate'}})</span></span>
   <span class="example-spacer"></span>
   <span class="example-spacer"></span>
-  <button mat-icon-button class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-    <mat-icon>favorite</mat-icon>
-  </button>
+  <a href="https://github.com/guidosch/easeeBilling" target="_blank" >
+  <button mat-icon-button class="example-icon favorite-icon" aria-label="Link to Githup project"
+  #tooltip="matTooltip"
+      matTooltip="Open source project by Guido Schnider. Click to see source code hosted on Github."
+      matTooltipHideDelay="100000"
+  
+  >
+    <mat-icon>public</mat-icon>
+  </button></a>
 
   <div style="float: right">
     <span style="margin-right: 5px">{{currentUser}}</span>
@@ -22,11 +28,12 @@
 
     <div style="display: block">
       <mat-chip-listbox aria-label="Timerange selection" [multiple]="true" [selectable]="true">
-        <mat-chip-option *ngFor="let chip of chips" [selected]="chip.state" (selectionChange)="changeSelected(chip)" (click)="chip.state=!chip.state">{{chip.name}}</mat-chip-option>
+        <mat-chip-option *ngFor="let chip of chips" [selected]="chip.state" (selectionChange)="changeSelected(chip)"
+          (click)="chip.state=!chip.state">{{chip.name}}</mat-chip-option>
       </mat-chip-listbox>
 
-      <div>...or...</div>
-      
+    <div style="margin: 2%;"></div>
+
       <form (ngSubmit)="onFormSubmit()" [formGroup]="timePeriodForm">
         <mat-form-field class="easee-full-width">
           <label>
@@ -49,15 +56,18 @@
           </mat-error>
         </mat-form-field>
         <span class="button-row">
-          <button [disabled]="!timePeriodForm.valid || !timePeriodForm.get('to')?.touched" color="primary" mat-flat-button
-            type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
+          <button [disabled]="!timePeriodForm.valid || !timePeriodForm.get('to')?.touched || !timePeriodForm.get('to')?.dirty" color="primary"
+            mat-flat-button type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
         </span>
       </form>
-      <div style="margin-top: 1%;">* Wenn das Interval grösser als 31 Tage ist, dann wird eine Fehlermeldung ausgegeben.
+      <div style="margin-top: 1%;" *ngIf="timeDiffInDays > 31">Das Zeitintervall ist grösser als ein Monat. Bitte
+        Inverall kleiner wählen.
       </div>
     </div>
 
-
+    <div *ngIf="chargers.length > 0">
+      <hr>
+    </div>
 
     <!-- billing overview table -->
     <div *ngIf="chargers.length > 0">
@@ -121,11 +131,18 @@
 
   </div>
 
-  <div style="padding-top: 20px" *ngIf="chargers.length> 0"><span class="button-row"><a (click)="onExport()"
-        color="primary" mat-flat-button><mat-icon>download</mat-icon>Export als CSV</a></span></div>
+  <!--ICONS: https://www.angularjswiki.com/angular/angular-material-icons-list-mat-icon-list/-->
+
+  <div style="padding-top: 20px" *ngIf="chargers.length> 0">
+    <span class="button-row"><a (click)="onExport()" color="primary" mat-flat-button><mat-icon>download</mat-icon>Export als CSV</a></span>
+  </div>
+
+  <div style="padding-top: 20px" *ngIf="chargers.length> 0">
+    <span class="button-row"><a (click)="reset()" color="primary" mat-flat-button><mat-icon>clear</mat-icon>Zurücksetzen</a></span>
+  </div>
 
   <div *ngIf="isLoadingResults" class="example-loading-shade">
-    <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
+    <mat-spinner *ngIf="isLoadingResults" [diameter]="50"></mat-spinner>
   </div>
 
   <!--

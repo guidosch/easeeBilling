@@ -80,7 +80,9 @@ export class AuthInterceptor implements HttpInterceptor {
             return throwError(() => new Error("Interval zu gross..."));
           }
         }
-        this.notification.showError(error.error.title)
+        let msg = error.error.title !== undefined ? error.error.title : "Request failed...";
+        this.notification.showError(msg);
+        this.router.navigate(['login']).then(_ => console.log('redirect to login'));
         return throwError(() => new Error("Request failed..."));
       }));
   }

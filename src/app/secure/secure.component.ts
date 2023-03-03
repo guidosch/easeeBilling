@@ -21,7 +21,7 @@ import { Products } from '../Products';
 import { validateDateNotInFuture } from '../date-validator.directive';
 import { NotificationService } from "../NotificationSerivce";
 import * as dayjs from 'dayjs'
-import * as _ from "lodash";
+import { remove, cloneDeep } from "lodash";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -120,6 +120,10 @@ export class SecureComponent implements OnInit {
     this.fillChips();
   }
 
+  /**
+   * Click on an month chip
+   * @param chip 
+   */
   changeSelected(chip: Chip): void {
     let dateTime = dayjs().set('month', chip.month).set('year', chip.year);
     let start = dateTime.set('date', 1).set('hour', 0).set('minute', 0);
@@ -175,7 +179,7 @@ export class SecureComponent implements OnInit {
       //array map where the index serves as lookup for the corresponding charger object which is in same order
       response.map((powerUsage: PowerUsage[], index: number) => {
         //clone charger object otherwise we change the same ref. and overwrite data
-        let charger = _.cloneDeep(this.getCharger(index));
+        let charger = cloneDeep(this.getCharger(index));
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);
@@ -198,7 +202,6 @@ export class SecureComponent implements OnInit {
   }
 
   handleData(data: Charger[]) {
-    data = data.sort(sortChargersByPPNumber);
     data = data.filter(data => data.totalCostsInPeriod > 0);
     if (data.length == 0) {
       this.notifications.showError("Keine Daten gefunden für diese Zeitpriode.");
@@ -206,7 +209,6 @@ export class SecureComponent implements OnInit {
 
       //if we already have data we just sum up to the existing charger
       if (this.chargers.length > 0) {
-
         for (let index = 0; index < this.chargers.length; index++) {
           const charger = this.chargers[index];
           if (data.filter(elem => elem.id === charger.id).length > 0) {
@@ -217,11 +219,10 @@ export class SecureComponent implements OnInit {
             charger.totalConsumptionKWhLowRate += chargerData.totalConsumptionKWhLowRate;
             charger.totalCostsInPeriod += chargerData.totalCostsInPeriod;
           }
-
         }
-      } else {
-        this.chargers = data;
       }
+      this.mergeChargers(data);
+      this.chargers = this.chargers.sort(sortChargersByPPNumber);
     }
     this.isLoadingResults = false;
   }
@@ -264,10 +265,51 @@ export class SecureComponent implements OnInit {
     this.resetChips();
   }
 
+  mergeChargers(data: Charger[]) {
+
+    //clone otherwise the loop breaks du to changes on the collection
+    let clonded = cloneDeep(this.chargers);
+
+    //remove all which are alrady part of the table and readd the summed up chargers again
+    clonded.forEach((charger, index) => {
+
+      data.forEach(dataCharger => {
+        if (dataCharger.id === charger.id) {
+          this.chargers.splice(index, 1);
+        }
+      });
+
+
+    });
+    this.chargers = this.chargers.concat(data);
+  }
+
+  /** 
+  
+        console.log("checking: "+charger.id +" user: "+charger.name);
+  
+        //check if exisitig data 
+        let indexOfCharger = data.map(elem => elem.id === charger.id).indexOf(true);
+        console.log("result: "+indexOfCharger);
+  
+        if (indexOfCharger != -1) {
+          console.log("removing from array: "+charger.id +" user: "+charger.name);
+          this.chargers.splice(indexOfCharger, 1);
+          //remove(this.chargers, function(charger.id));
+  
+        }
+      });
+  
+      */
+
+
+
 }
 
+
+
 function getUsers(permissions: Permission[]) {
-  return permissions.map(entry => entry.name).join(",");
+  return permissions.map(entry => entry.name).join(", ");
 }
 
 function sortChargersByPPNumber(a: Charger, b: Charger) {
@@ -362,9 +404,5 @@ function sumCosts(charger: Charger) {
   charger.totalConsumptionKWhLowRate = kWhLow;
   charger.totalCostsInPeriod = sum;
   charger.totalConsumptionEligibleForSolar = solarPower;
-}
-
-function mergeById(value: Charger, index: number, array: Charger[]): unknown {
-  throw new Error('Function not implemented.');
 }
 

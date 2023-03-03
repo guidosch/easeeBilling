@@ -267,20 +267,28 @@ export class SecureComponent implements OnInit {
 
   mergeChargers(data: Charger[]) {
 
+    let toBeRemoved: number[] = [];
     //clone otherwise the loop breaks du to changes on the collection
     let clonded = cloneDeep(this.chargers);
 
     //remove all which are alrady part of the table and readd the summed up chargers again
     clonded.forEach((charger, index) => {
+      console.log("checking: "+charger.id +" user: "+charger.name);
 
       data.forEach(dataCharger => {
         if (dataCharger.id === charger.id) {
-          this.chargers.splice(index, 1);
+          console.log("removing from array: "+charger.id +" user: "+charger.name);
+          toBeRemoved.push(index);
         }
       });
 
+      //removing by indexes
+      toBeRemoved.forEach(index => {
+        this.chargers.splice(index,1);
+      });
 
     });
+    //adding new once
     this.chargers = this.chargers.concat(data);
   }
 

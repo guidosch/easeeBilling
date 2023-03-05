@@ -21,6 +21,8 @@ import { Products } from '../Products';
 import { validateDateNotInFuture } from '../date-validator.directive';
 import { NotificationService } from "../NotificationSerivce";
 import * as dayjs from 'dayjs'
+import * as timezone from 'dayjs/plugin/timezone';
+import * as utc from 'dayjs/plugin/utc';
 import { remove, cloneDeep } from "lodash";
 
 
@@ -64,8 +66,7 @@ export class SecureComponent implements OnInit {
   currentUser = '';
   isLoadingResults: boolean = false;
   displayedColumns: string[] = ['name', 'users', 'totalConsumption', 'totalConsumptionKWhLowRate', 'totalConsumptionKWhHighRate', 'totalConsumptionEligibleForSolar', 'totalCostsInPeriod'];
-  //data for table
-  chargers: Charger[] = [];
+  chargers: Charger[] = []; //data for table
   personalChargers: string[] = [];
   userRole: number = 0;
   matcher = new MyErrorStateMatcher();
@@ -105,6 +106,9 @@ export class SecureComponent implements OnInit {
       //load data for all or just the personal chargers
     });
 
+    dayjs.extend(timezone); //init plugin
+    dayjs.extend(utc); //init plugin
+
   }
   fillChips() {
     let now = dayjs().date(15);
@@ -125,10 +129,15 @@ export class SecureComponent implements OnInit {
    * @param chip 
    */
   changeSelected(chip: Chip): void {
-    let dateTime = dayjs().set('month', chip.month).set('year', chip.year);
+    let dateTime = dayjs().utc().set('month', chip.month).set('year', chip.year);
     let start = dateTime.set('date', 1).set('hour', 0).set('minute', 0);
-    let end = dateTime.set('date', dateTime.daysInMonth()).set('hour', 23).set('minute', 59);
-
+    let end: dayjs.Dayjs = dayjs();
+    if (dayjs.utc().get('month') === chip.month) {
+      end = dateTime.set('hour', 23).set('minute', 59);
+    } else {
+      end = dateTime.set('date', dateTime.daysInMonth()).set('hour', 23).set('minute', 59);
+    }
+    
     this.loadData(start.toISOString(), end.toISOString());
   }
 
@@ -266,55 +275,25 @@ export class SecureComponent implements OnInit {
   }
 
   mergeChargers(data: Charger[]) {
-
-    let toBeRemoved: number[] = [];
-    //clone otherwise the loop breaks du to changes on the collection
-    let clonded = cloneDeep(this.chargers);
-
-    //remove all which are alrady part of the table and readd the summed up chargers again
-    clonded.forEach((charger, index) => {
-      console.log("checking: "+charger.id +" user: "+charger.name);
-
+    //collect ids to be removed from table
+    let toBeRemoved: string[] = [];
+    this.chargers.forEach(charger => {
       data.forEach(dataCharger => {
-        if (dataCharger.id === charger.id) {
-          console.log("removing from array: "+charger.id +" user: "+charger.name);
-          toBeRemoved.push(index);
+        if (charger.id === dataCharger.id) {
+          console.log("removing from table: "+charger.id +" PP: "+charger.name);
+          toBeRemoved.push(charger.id);
         }
       });
-
-      //removing by indexes
-      toBeRemoved.forEach(index => {
-        this.chargers.splice(index,1);
-      });
-
     });
-    //adding new once
+    //remove the charger we already have in the table from the new data as we summed up the consumtion already.
+    remove(data, function (charger) { 
+      return toBeRemoved.indexOf(charger.id) != -1;
+    });
+    //adding new the summed up ones
     this.chargers = this.chargers.concat(data);
   }
 
-  /** 
-  
-        console.log("checking: "+charger.id +" user: "+charger.name);
-  
-        //check if exisitig data 
-        let indexOfCharger = data.map(elem => elem.id === charger.id).indexOf(true);
-        console.log("result: "+indexOfCharger);
-  
-        if (indexOfCharger != -1) {
-          console.log("removing from array: "+charger.id +" user: "+charger.name);
-          this.chargers.splice(indexOfCharger, 1);
-          //remove(this.chargers, function(charger.id));
-  
-        }
-      });
-  
-      */
-
-
-
 }
-
-
 
 function getUsers(permissions: Permission[]) {
   return permissions.map(entry => entry.name).join(", ");

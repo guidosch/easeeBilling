@@ -2,6 +2,9 @@
     <span>Abrechnung Ladestationen Tièchestrasse (Login mit <a href="https://easee.cloud/" target="_blank">Easee
             Account</a> Login Daten)</span>
     <span class="example-spacer"></span>
+    <div class="easee-loading-shade" *ngIf="isLoadingResults" style="margin-top: 2%;">
+        <mat-spinner *ngIf="isLoadingResults" [diameter]="50"></mat-spinner>
+    </div>
     <span class="example-spacer"></span>
     <a href="https://github.com/guidosch/easeeBilling" target="_blank">
         <button mat-icon-button class="example-icon favorite-icon" aria-label="Link to Githup project"
@@ -39,7 +42,3 @@
         </div>
     </form>
 </mat-card>
-
-<div class="easee-loading-shade" *ngIf="isLoadingResults" style="margin-top: 2%;">
-    <mat-spinner *ngIf="isLoadingResults" [diameter]="50"></mat-spinner>
-</div>

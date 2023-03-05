@@ -8,9 +8,11 @@ describe('SecureComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SecureComponent ]
+      declarations: [ SecureComponent ],
+      providers: [component, ]
     })
     .compileComponents();
+    //TestBed.inject();
   });
 
   beforeEach(() => {
@@ -23,3 +25,7 @@ describe('SecureComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+class MochAuthService {
+
+}

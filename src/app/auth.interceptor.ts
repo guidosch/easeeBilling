@@ -82,7 +82,8 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         let msg = error.error.title !== undefined ? error.error.title : "Request failed...";
         this.notification.showError(msg);
-        this.router.navigate(['login']).then(_ => console.log('redirect to login'));
+        //does not make sense as if one of the requests fails a redirect is done.
+        //this.router.navigate(['login']).then(_ => console.log('redirect to login'));
         return throwError(() => new Error("Request failed..."));
       }));
   }

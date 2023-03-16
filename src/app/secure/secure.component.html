@@ -111,14 +111,14 @@
 
         <!-- total kWh Solar el Column -->
         <ng-container matColumnDef="totalConsumptionEligibleForSolar">
-          <th *matHeaderCellDef mat-header-cell> Total kWh Solarertrag*</th>
+          <th *matHeaderCellDef mat-header-cell> Total kWh Solarertrag &#185;</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionEligibleForSolar | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionEligibleForSolar() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total cost Column -->
         <ng-container matColumnDef="totalCostsInPeriod">
-          <th *matHeaderCellDef mat-header-cell> Total Kosten in CHF</th>
+          <th *matHeaderCellDef mat-header-cell> Total Kosten in CHF &#178;</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalCostsInPeriod | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalCostInPeriod() | number: '1.0-2'}} </td>
         </ng-container>
@@ -127,7 +127,8 @@
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
         <tr *matFooterRowDef="displayedColumns" mat-footer-row></tr>
       </table>
-    </div class="container"><span>* Anteil der KWh, die potentiell durch Solarstrom erzeugt wurden.</span></div>
+    <div class="container"><span>&#185; Anteil der KWh, die potentiell durch unsere Solaranlage erzeugt wurden.</span></div>
+    <div style="padding-left: 20px;"><span>&#178; Total Kosten sind eine Näherung, da der Solarstrom nicht pro Ladestation zugeordnet werden kann. Auch gibt es noch allg. Kosten, die anteilsmässig verteilt werden.</span></div>
     </div>
 
 

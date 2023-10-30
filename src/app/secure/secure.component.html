@@ -97,14 +97,14 @@
 
         <!-- total kWh Niedertarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhLowRate">
-          <th *matHeaderCellDef mat-header-cell> Total kWh Niedertarif</th>
+          <th *matHeaderCellDef mat-header-cell> Total kWh Niedertarif (~15 Rp./kWh)</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhLowRate | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionLowRate() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total kWh Hochtarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhHighRate">
-          <th *matHeaderCellDef mat-header-cell> Total kWh Hochtarif</th>
+          <th *matHeaderCellDef mat-header-cell> Total kWh Hochtarif (~41 Rp./kWh)</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhHighRate | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionHighRate() | number: '1.0-2'}} </td>
         </ng-container>

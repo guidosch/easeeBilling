@@ -27,6 +27,8 @@ import { remove, cloneDeep } from "lodash";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
+
+//tarife 2023 mit erster Rechnung anschauen
 const HIGH_RATE = 0.4077;
 const LOW_RATE = 0.1449;
 
@@ -327,11 +329,11 @@ function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
         element.highRate = false;
         element.solarPower = true;
         break;
-      case "11:00:00":
+      case "11:00:00": //HT
         element.highRate = true;
         element.solarPower = true;
         break;
-      case "12:00:00":
+      case "12:00:00": //HT
         element.highRate = true;
         element.solarPower = true;
         break;
@@ -351,10 +353,10 @@ function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
         element.highRate = false;
         element.solarPower = false;
         break;
-      case "18:00:00":
+      case "18:00:00"://HT
         element.highRate = true;
         element.solarPower = false;
-        break;
+        break; //HT
       case "19:00:00":
         element.highRate = true;
         element.solarPower = false;

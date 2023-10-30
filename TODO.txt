@@ -1,0 +1,4 @@
+- Refresh users as there are new charging stations in use: See  mapChargerToPermissionData() function
+- Allow substrct data by unselecting daysInMont
+- Runden auf 5 Rappen
+- Alle Zahlen mit zwei Stellen nach dem Komma

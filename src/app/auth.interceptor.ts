@@ -31,7 +31,8 @@ export class AuthInterceptor implements HttpInterceptor {
     if (token) {
       request = request.clone({
         setHeaders: {
-          Authorization: 'Bearer ' + token
+          Authorization: 'Bearer ' + token,
+          Accept: 'application/json'
         }
       });
     }
@@ -44,10 +45,6 @@ export class AuthInterceptor implements HttpInterceptor {
       });
     }
 
-    request = request.clone({
-      headers: request.headers.set('Accept', 'application/json')
-    });
-
     return next.handle(request).pipe(
       map((event: HttpEvent<any>) => {
         if (event instanceof HttpResponse) {
@@ -57,9 +54,15 @@ export class AuthInterceptor implements HttpInterceptor {
       }),
       catchError((error: HttpErrorResponse) => {
         console.log(error);
+        console.log("error.status: "+error.status);
         if (error.status === 401) {
           if (error.statusText === 'OK') {
-            this.authService.refreshToken({ refresh_token: refreshToken })
+            //handle refresh token expired
+            if (error.error && error.error.errorCode === 104) {
+              this.router.navigate(['login']).then(_ => console.log('redirect to login'));
+              return throwError(() => new Error("Refresh token expired..."));
+            }
+            this.authService.refreshToken({ refreshToken: refreshToken, accessToken: token })
               .subscribe(() => {
                 location.reload();
               });
@@ -79,11 +82,20 @@ export class AuthInterceptor implements HttpInterceptor {
             this.notification.showError(error.error)
             return throwError(() => new Error("Interval zu gross..."));
           }
+        } else if (error.status === 405) {
+          // auth calls should be done by now and try to reload.
+          location.reload();
+
+        } else if (error.status === 0 || error.status >=500) {  //cors error or server error
+          this.router.navigate(['login']).then(_ => console.log('redirect to login'));
+          error.error.title = "Something went wrong. Please login again."
         }
-        let msg = error.error.title !== undefined ? error.error.title : "Request failed...";
-        this.notification.showError(msg);
-        //does not make sense as if one of the requests fails a redirect is done.
-        //this.router.navigate(['login']).then(_ => console.log('redirect to login'));
+        if (error.error && error.error.title){
+          this.notification.showError(error.error.title);
+        } else {
+          this.notification.showError("Request failed...");
+        }
+        //do not redirect to login page as some unknown errors are caught here
         return throwError(() => new Error("Request failed..."));
       }));
   }

@@ -26,8 +26,7 @@ export class AuthService {
       console.error('An error occurred:', error.error.message);
     } else {
       console.error(
-        `Backend returned code ${error.status}, ` +
-        `body was: ${error.error}`);
+        `Backend returned error: ${JSON.stringify(error)}`);
     }
     return throwError(
       'Something bad happened; please try again later.');
@@ -57,14 +56,15 @@ export class AuthService {
   }
 
   refreshToken(refreshData: any): Observable<any> {
-    this.tokenService.removeToken();
-    this.tokenService.removeRefreshToken();
-    const body = new HttpParams()
-      .set('refreshToken', refreshData.refresh_token)
-      .set('grant_type', 'refreshToken');
-    return this.http.post<any>(API_URL, body, HTTP_OPTIONS)
-      .pipe(
-        tap(res => {
+    const data = {
+      refreshToken: refreshData.refreshToken,
+      accessToken: refreshData.accessToken
+    }
+    return this.http.post<any>(API_URL+"refresh_token", data, HTTP_OPTIONS)
+    .pipe(
+      tap(res => {
+          this.tokenService.removeToken();
+          this.tokenService.removeRefreshToken();
           this.tokenService.saveToken(res.accessToken);
           this.tokenService.saveRefreshToken(res.refreshToken);
         }),

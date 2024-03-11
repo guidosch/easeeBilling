@@ -16,6 +16,9 @@ export interface Permission {
     name: string;
     phoneNumber: string;
     email: string;
+    invitationId?: string | null;
+    expiresInDays?: number | null;
+
 }
 
 export interface PowerUsage {

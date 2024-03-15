@@ -27,10 +27,11 @@ import { remove, cloneDeep } from "lodash";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
+//39.47 Rp./kWh 14,85 Rp./kWh --> 28.12.2023
 
 //tarife 2023 mit erster Rechnung anschauen
-const HIGH_RATE = 0.4077;
-const LOW_RATE = 0.1449;
+const HIGH_RATE = 0.3947;
+const LOW_RATE = 0.1485;
 
 var optionsForCSVExport = {
   showLabels: true,
@@ -114,7 +115,7 @@ export class SecureComponent implements OnInit {
   }
   fillChips() {
     let now = dayjs().date(15);
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 16; i++) {
       let temp = now.subtract(i, "month");
       let month = { name: temp.format("MMMM"), state: false, month: temp.month(), year: temp.year() };
       this.chips.push(month);

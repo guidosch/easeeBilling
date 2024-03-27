@@ -140,7 +140,7 @@ export class SecureComponent implements OnInit {
     } else {
       end = dateTime.set('date', dateTime.daysInMonth()).set('hour', 23).set('minute', 59);
     }
-    
+
     this.loadData(start.toISOString(), end.toISOString());
   }
 
@@ -283,17 +283,25 @@ export class SecureComponent implements OnInit {
     this.chargers.forEach(charger => {
       data.forEach(dataCharger => {
         if (charger.id === dataCharger.id) {
-          console.log("removing from table: "+charger.id +" PP: "+charger.name);
+          console.log("removing from table: " + charger.id + " PP: " + charger.name);
           toBeRemoved.push(charger.id);
         }
       });
     });
     //remove the charger we already have in the table from the new data as we summed up the consumtion already.
-    remove(data, function (charger) { 
+    remove(data, function (charger) {
       return toBeRemoved.indexOf(charger.id) != -1;
     });
     //adding new the summed up ones
     this.chargers = this.chargers.concat(data);
+  }
+
+  getHighRate(): number {
+    return Math.round(HIGH_RATE * 100);
+  }
+
+  getLowRate(): number {
+    return Math.round(LOW_RATE * 100);
   }
 
 }

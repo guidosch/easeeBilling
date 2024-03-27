@@ -97,14 +97,14 @@
 
         <!-- total kWh Niedertarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhLowRate">
-          <th *matHeaderCellDef mat-header-cell> Total kWh Niedertarif (~15 Rp./kWh)</th>
+          <th *matHeaderCellDef mat-header-cell> Total kWh Niedertarif (~{{getLowRate()}} Rp./kWh)</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhLowRate | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionLowRate() | number: '1.0-2'}} </td>
         </ng-container>
 
         <!-- total kWh Hochtarif Column -->
         <ng-container matColumnDef="totalConsumptionKWhHighRate">
-          <th *matHeaderCellDef mat-header-cell> Total kWh Hochtarif (~41 Rp./kWh)</th>
+          <th *matHeaderCellDef mat-header-cell> Total kWh Hochtarif (~{{getHighRate()}} Rp./kWh)</th>
           <td *matCellDef="let charger" mat-cell> {{ charger.totalConsumptionKWhHighRate | number: '1.0-2'}} </td>
           <td *matFooterCellDef mat-footer-cell> {{getTotalConsumptionHighRate() | number: '1.0-2'}} </td>
         </ng-container>
@@ -127,8 +127,11 @@
         <tr *matRowDef="let row; columns: displayedColumns;" mat-row></tr>
         <tr *matFooterRowDef="displayedColumns" mat-footer-row></tr>
       </table>
-    <div class="container"><span>&#185; Anteil der KWh, die potentiell durch unsere Solaranlage erzeugt wurden.</span></div>
-    <div style="padding-left: 20px;"><span>&#178; Total Kosten sind eine Näherung, da der Solarstrom nicht pro Ladestation zugeordnet werden kann. Auch gibt es noch allg. Kosten, die anteilsmässig verteilt werden.</span></div>
+      <div class="container"><span>&#185; Anteil der KWh, die potentiell durch unsere Solaranlage erzeugt wurden.</span>
+      </div>
+      <div style="padding-left: 20px;"><span>&#178; Total Kosten sind eine Näherung, da der Solarstrom nicht pro
+          Ladestation zugeordnet werden kann. Auch gibt es noch allg. Kosten, die anteilsmässig verteilt werden.</span>
+      </div>
     </div>
 
 

@@ -165,7 +165,6 @@ export class SecureComponent implements OnInit {
   mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations
     let observables = this.chargerIDs().map((id: string) => {
-      console.log("getting permissions for charger: " + id);
       return this.esaeeApi.getChargerPermissions(id);
     });
     let result: Charger[] = [];
@@ -289,7 +288,7 @@ export class SecureComponent implements OnInit {
     this.chargers.forEach(charger => {
       data.forEach(dataCharger => {
         if (charger.id === dataCharger.id) {
-          console.log("removing from table: " + charger.id + " PP: " + charger.name);
+          //console.log("removing from table: " + charger.id + " PP: " + charger.name);
           toBeRemoved.push(charger.id);
         }
       });

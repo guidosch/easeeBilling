@@ -165,6 +165,7 @@ export class SecureComponent implements OnInit {
   mapChargerToPermissionData(): void {
     //creates http get observables for all charger stations
     let observables = this.chargerIDs().map((id: string) => {
+      console.log("getting permissions for charger: " + id);
       return this.esaeeApi.getChargerPermissions(id);
     });
     let result: Charger[] = [];
@@ -207,7 +208,7 @@ export class SecureComponent implements OnInit {
   }
 
   getCharger(index: number): Charger {
-    if (this.userRole == 1) { //user role 1 is site admin
+    if (this.isSiteAdmin()) {
       return allChargers[index];
     }
     return allChargers.filter(charger => charger.id == this.personalChargers[0])[0];
@@ -245,10 +246,15 @@ export class SecureComponent implements OnInit {
   }
 
   chargerIDs(): Array<string> {
-    if (this.userRole == 1) { //user role 1 is site admin
+    if (this.isSiteAdmin()) { //user role 2 is site admin
       return allChargers.map(elem => elem.id)
     }
     return this.personalChargers;
+  }
+
+  isSiteAdmin(): any {
+    //user role 2 is site admin
+    return this.userRole == 2;
   }
 
   logout(): void {

@@ -1,5 +1,5 @@
 <mat-toolbar>
-  <span>Abrechnung Ladestation<span *ngIf="userRole == 1">en</span>&nbsp;<span *ngIf="from.getTime() > 1">(Nutzungdauer
+  <span>Abrechnung Ladestation<span *ngIf="isSiteAdmin()">en</span>&nbsp;<span *ngIf="from.getTime() > 1">(Nutzungdauer
       von {{from | date:'mediumDate'}} bis {{toInLocalTime|
       date:'mediumDate'}})</span></span>
   <div *ngIf="isLoadingResults" class="example-loading-shade">

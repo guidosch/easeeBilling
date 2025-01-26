@@ -1,6 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 src/app/ChargersWithUsers.ts
 
+src/app/allUsers.json
+
 # compiled output
 /dist
 /tmp

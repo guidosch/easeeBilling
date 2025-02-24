@@ -28,10 +28,11 @@ import { remove, cloneDeep } from "lodash";
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
 //39.47 Rp./kWh 14,85 Rp./kWh --> 28.12.2023
+//41.22.47 Rp./kWh 16,62 Rp./kWh --> 24.02.2025
 
-//tarife 2023 mit erster Rechnung anschauen
-const HIGH_RATE = 0.3947;
-const LOW_RATE = 0.1485;
+//tarife 2026 mit erster Rechnung anschauen
+const HIGH_RATE = 0.4122;
+const LOW_RATE = 0.1662;
 
 var optionsForCSVExport = {
   showLabels: true,

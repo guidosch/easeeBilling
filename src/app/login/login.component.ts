@@ -12,9 +12,10 @@ export class MyErrorStateMatcher implements ErrorStateMatcher {
 }
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['../app.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['../app.component.css'],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
 

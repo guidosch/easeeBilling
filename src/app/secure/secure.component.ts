@@ -54,10 +54,11 @@ interface Chip {
 }
 
 @Component({
-  selector: 'app-secure',
-  templateUrl: './secure.component.html',
-  styleUrls: ['../app.component.css'],
-  encapsulation: ViewEncapsulation.None
+    selector: 'app-secure',
+    templateUrl: './secure.component.html',
+    styleUrls: ['../app.component.css'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class SecureComponent implements OnInit {
 

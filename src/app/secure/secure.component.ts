@@ -20,9 +20,9 @@ import { allChargers } from '../ChargersWithUsers'; //not in git due to security
 import { Products } from '../Products';
 import { validateDateNotInFuture } from '../date-validator.directive';
 import { NotificationService } from "../NotificationSerivce";
-import * as dayjs from 'dayjs'
-import * as timezone from 'dayjs/plugin/timezone';
-import * as utc from 'dayjs/plugin/utc';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { remove, cloneDeep } from "lodash";
 
 
@@ -194,6 +194,10 @@ export class SecureComponent implements OnInit {
       response.map((powerUsage: PowerUsage[], index: number) => {
         //clone charger object otherwise we change the same ref. and overwrite data
         let charger = cloneDeep(this.getCharger(index));
+        if (!charger) {
+          console.error("charger not found. Make sure you have an up to date charger file in your path!" + index);
+          return
+        }
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);

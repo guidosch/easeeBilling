@@ -317,11 +317,11 @@ export class SecureComponent implements OnInit {
 
 }
 
-function getUsers(permissions: Permission[]) {
+export function getUsers(permissions: Permission[]) {
   return permissions.map(entry => entry.name).join(", ");
 }
 
-function sortChargersByPPNumber(a: Charger, b: Charger) {
+export function sortChargersByPPNumber(a: Charger, b: Charger) {
   // @ts-ignore
   let ppNumberA = a.name.match(/\d+/).shift();
   // @ts-ignore
@@ -337,7 +337,7 @@ function sortChargersByPPNumber(a: Charger, b: Charger) {
   return 0;
 }
 
-function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
+export function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
   powerUsage.forEach(element => {
     let localTime = new Date(element.from).toLocaleTimeString();
     switch (localTime) {
@@ -390,7 +390,7 @@ function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
   return powerUsage;
 }
 
-function sumCosts(charger: Charger) {
+export function sumCosts(charger: Charger) {
   let sum = 0;
   let kWhHigh = 0;
   let kWhLow = 0;

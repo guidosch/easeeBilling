@@ -23,7 +23,6 @@ import { NotificationService } from "../NotificationSerivce";
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
-import { remove, cloneDeep } from "lodash";
 
 
 //40,77 Rp./kWh 14,49 Rp./kWh --> 28.12.2022
@@ -193,11 +192,12 @@ export class SecureComponent implements OnInit {
       //array map where the index serves as lookup for the corresponding charger object which is in same order
       response.map((powerUsage: PowerUsage[], index: number) => {
         //clone charger object otherwise we change the same ref. and overwrite data
-        let charger = cloneDeep(this.getCharger(index));
-        if (!charger) {
+        const source = this.getCharger(index);
+        if (!source) {
           console.error("charger not found. Make sure you have an up to date charger file in your path!" + index);
           return
         }
+        let charger = structuredClone(source);
         charger.powerUsage = checkTimeForHighRate(powerUsage)
         charger.users = getUsers(charger.permissions);
         sumCosts(charger);
@@ -300,9 +300,7 @@ export class SecureComponent implements OnInit {
       });
     });
     //remove the charger we already have in the table from the new data as we summed up the consumtion already.
-    remove(data, function (charger) {
-      return toBeRemoved.indexOf(charger.id) != -1;
-    });
+    data = data.filter(charger => toBeRemoved.indexOf(charger.id) == -1);
     //adding new the summed up ones
     this.chargers = this.chargers.concat(data);
   }

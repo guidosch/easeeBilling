@@ -26,7 +26,6 @@
     "@angular/router": "^19.2.10",
     "angular-csv-ext": "^1.0.5",
     "dayjs": "^1.11.13",
-    "lodash": "^4.17.21",
     "rxjs": "^7.8.2",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

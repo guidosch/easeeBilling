@@ -27,3 +27,5 @@ The user id can be found in the allUsers.json export (locally or see response fr
 
 ## Angular ng binary
 `node_modules/@angular/cli/bin/ng`
+
+## OpenSpec installed. See Claude.md file for skills

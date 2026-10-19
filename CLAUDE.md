@@ -82,3 +82,18 @@ npm test         # Karma + Jasmine tests
 - Rate tiers and solar tracking windows are hardcoded in `secure.component.ts`
 - Electricity prices may need updating yearly — search for `HIGH_RATE` / `LOW_RATE` constants
 - Charger parking places are named PP01–PP37
+
+## Openspec is installed with serveral skills
+
+Openspec allows spec driven development but is more lightweight than SpecKit: https://openspec.dev/docs
+
+It creates an /openspec folder and installs a few skills that are used in order:
+
+| Skill | Job | Type |
+|---|---|---|
+| openspec-explore | Think through an idea before it becomes a change proposal | Core |
+| openspec-propose | Create a change proposal with all its planning artifacts in one step | Core |
+| openspec-apply-change | Implement a change proposal's tasks | Core |
+| openspec-update-change | Revise a change proposal's plan | Core |
+| openspec-sync-specs | Merge a change proposal's spec updates into specs/ | Core |
+| openspec-archive-change | Move a finished change proposal to the archive | Core |

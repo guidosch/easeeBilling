@@ -48,3 +48,12 @@ table {
 .example-spacer {
     flex: 1 1 auto;
   }
+
+/* Month chips from a previous year */
+.previous-year-chip {
+  --mdc-chip-elevated-container-color: #ffe0b2;
+  --mdc-chip-elevated-selected-container-color: #ffb74d;
+  --mdc-chip-label-text-color: #212121;
+  --mdc-chip-selected-label-text-color: #212121;
+  --mdc-chip-with-icon-selected-icon-color: #212121;
+}

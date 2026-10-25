@@ -62,6 +62,7 @@ interface Chip {
 export class SecureComponent implements OnInit {
 
   chips: Chip[] = [];
+  currentYear = dayjs().year();
 
   timePeriodForm!: UntypedFormGroup;
   from: Date = new Date(0);
@@ -118,7 +119,7 @@ export class SecureComponent implements OnInit {
     let now = dayjs().date(15);
     for (let i = 0; i < 16; i++) {
       let temp = now.subtract(i, "month");
-      let month = { name: temp.format("MMMM"), state: false, month: temp.month(), year: temp.year() };
+      let month = { name: temp.format("MMMM 'YY"), state: false, month: temp.month(), year: temp.year() };
       this.chips.push(month);
     }
   }

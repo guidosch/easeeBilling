@@ -29,6 +29,7 @@
     <div style="display: block">
       <mat-chip-listbox aria-label="Timerange selection" [multiple]="true" [selectable]="true">
         <mat-chip-option *ngFor="let chip of chips" [selected]="chip.state" (selectionChange)="changeSelected(chip)"
+          [class.previous-year-chip]="chip.year < currentYear"
           (click)="chip.state=!chip.state">{{chip.name}}</mat-chip-option>
       </mat-chip-listbox>
 

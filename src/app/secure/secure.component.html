@@ -14,6 +14,12 @@
       <mat-icon>public</mat-icon>
     </button></a>
 
+  <span *ngIf="isSiteAdmin()" class="rate-limit-counter" [class.rate-limit-low]="isRateLimitWarning()"
+    #rateTooltip="matTooltip"
+    matTooltip="Die Easee API erlaubt max. {{maxRequests}} Anfragen in 5 Minuten. Eine Abfrage braucht {{requestsPerLoad()}} Anfragen (eine pro Ladestation).">
+    API: {{rateLimitStatus.remaining}}/{{maxRequests}} frei
+  </span>
+
   <div style="float: right">
     <span style="margin-right: 5px">{{currentUser}}</span>
     <span class="button-row"><a (click)="logout()" color="primary"
@@ -27,7 +33,16 @@
 
 
     <div style="display: block">
-      <mat-chip-listbox aria-label="Timerange selection" [multiple]="true" [selectable]="true">
+      <div *ngIf="isSiteAdmin() && isRateLimitWarning()" class="rate-limit-warning">
+        <mat-icon>warning</mat-icon>
+        <span *ngIf="isRateLimited(); else lowRequests">API-Limit erreicht. Nächste Abfrage möglich in
+          {{rateLimitWait()}} Min.</span>
+        <ng-template #lowRequests><span>Achtung: nur noch {{rateLimitStatus.remaining}} API-Anfragen frei – reicht
+            für noch {{loadsLeft()}} Abfrage(n).</span></ng-template>
+      </div>
+
+      <mat-chip-listbox aria-label="Timerange selection" [multiple]="true" [selectable]="true"
+        [disabled]="isRateLimited()">
         <mat-chip-option *ngFor="let chip of chips" [selected]="chip.state" (selectionChange)="changeSelected(chip)"
           [class.previous-year-chip]="chip.year < currentYear"
           (click)="chip.state=!chip.state">{{chip.name}}</mat-chip-option>
@@ -58,7 +73,7 @@
         </mat-form-field>
         <span class="button-row">
           <button
-            [disabled]="!timePeriodForm.valid || !timePeriodForm.get('to')?.touched || !timePeriodForm.get('to')?.dirty"
+            [disabled]="isRateLimited() || !timePeriodForm.valid || !timePeriodForm.get('to')?.touched || !timePeriodForm.get('to')?.dirty"
             color="primary" mat-flat-button type="submit"><mat-icon>insights</mat-icon>&nbsp;Lade Daten</button>
         </span>
       </form>

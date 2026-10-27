@@ -57,3 +57,29 @@ table {
   --mdc-chip-selected-label-text-color: #212121;
   --mdc-chip-with-icon-selected-icon-color: #212121;
 }
+
+/* Easee API rate limit */
+.rate-limit-counter {
+  font-size: 14px;
+  margin-right: 16px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: #e8f5e9;
+  color: #1b5e20;
+}
+
+.rate-limit-counter.rate-limit-low {
+  background-color: #ffe0b2;
+  color: #e65100;
+}
+
+.rate-limit-warning {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #fff3e0;
+  color: #e65100;
+}

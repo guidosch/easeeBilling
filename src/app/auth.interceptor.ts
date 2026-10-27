@@ -6,6 +6,7 @@ import { TokenService } from './token.service';
 import { catchError, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { NotificationService } from "./NotificationSerivce";
+import { RateLimitService } from './rate-limit.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -13,7 +14,8 @@ export class AuthInterceptor implements HttpInterceptor {
     private router: Router,
     private tokenService: TokenService,
     private authService: AuthService,
-    private notification: NotificationService) {
+    private notification: NotificationService,
+    private rateLimit: RateLimitService) {
   }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): any {
@@ -28,6 +30,11 @@ export class AuthInterceptor implements HttpInterceptor {
           Accept: 'application/json'
         }
       });
+    }
+
+    //count requests against the easee rate limit
+    if (request.url.startsWith('https://api.easee.cloud/')) {
+      this.rateLimit.record();
     }
 
     if (!request.headers.has('Content-Type')) {
@@ -48,6 +55,13 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         console.log(error);
         console.log("error.status: "+error.status);
+        if (error.status === 429) {
+          //too many requests
+          const retryAfter = error.headers?.get('Retry-After');
+          this.rateLimit.block(retryAfter ? Number(retryAfter) * 1000 : undefined);
+          this.notification.showError("Rate Limit der Easee API erreicht. Bitte warten...");
+          return throwError(() => new Error("Rate limit reached..."));
+        }
         if (error.status === 401) {
           if (error.statusText === 'OK') {
             //handle refresh token expired

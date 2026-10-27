@@ -1,4 +1,5 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth.service';
 import { Router } from '@angular/router';
 import { EaseeApiService } from "../easee-api.service";
@@ -20,6 +21,7 @@ import { allChargers } from '../ChargersWithUsers'; //not in git due to security
 import { Products } from '../Products';
 import { validateDateNotInFuture } from '../date-validator.directive';
 import { NotificationService } from "../NotificationSerivce";
+import { formatWait, MAX_REQUESTS, RateLimitService, RateLimitStatus } from '../rate-limit.service';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -76,11 +78,16 @@ export class SecureComponent implements OnInit {
   userRole: number = 0;
   matcher = new MyErrorStateMatcher();
   timeDiffInDays: number = 0;
+  maxRequests = MAX_REQUESTS;
+  rateLimitStatus: RateLimitStatus = { used: 0, remaining: MAX_REQUESTS, waitMs: 0 };
+  private rateLimitWarningShown = false;
 
   constructor(private authService: AuthService, private esaeeApi: EaseeApiService,
     private router: Router,
     private formBuilder: UntypedFormBuilder,
-    private notifications: NotificationService) { }
+    private notifications: NotificationService,
+    private rateLimit: RateLimitService,
+    private destroyRef: DestroyRef) { }
 
   ngOnInit(): void {
     this.fillChips();
@@ -110,6 +117,10 @@ export class SecureComponent implements OnInit {
       });
       //load data for all or just the personal chargers
     });
+
+    this.rateLimit.status(() => this.requestsPerLoad())
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(status => this.updateRateLimitStatus(status));
 
     dayjs.extend(timezone); //init plugin
     dayjs.extend(utc); //init plugin
@@ -184,6 +195,11 @@ export class SecureComponent implements OnInit {
 
 
   loadData(from: string, to: string): void {
+    const waitMs = this.rateLimit.msUntilAvailable(this.requestsPerLoad());
+    if (waitMs > 0) {
+      this.notifications.showError("API-Limit erreicht. Nächste Abfrage möglich in " + formatWait(waitMs) + " Min.");
+      return;
+    }
     this.isLoadingResults = true;
     let observables = this.chargerIDs().map((id: string) => {
       return this.esaeeApi.getChargerConsumption(id, from, to);
@@ -256,6 +272,44 @@ export class SecureComponent implements OnInit {
       return allChargers.map(elem => elem.id)
     }
     return this.personalChargers;
+  }
+
+  /**
+   * Number of api requests one data load needs (one per charger)
+   */
+  requestsPerLoad(): number {
+    return this.chargerIDs().length;
+  }
+
+  updateRateLimitStatus(status: RateLimitStatus) {
+    this.rateLimitStatus = status;
+    if (this.isSiteAdmin() && this.isRateLimitWarning()) {
+      if (!this.rateLimitWarningShown) {
+        this.notifications.showError("Achtung: nur noch " + status.remaining + " von " + MAX_REQUESTS + " API-Anfragen frei.");
+        this.rateLimitWarningShown = true;
+      }
+    } else {
+      this.rateLimitWarningShown = false;
+    }
+  }
+
+  /**
+   * Less requests left than needed for two more data loads
+   */
+  isRateLimitWarning(): boolean {
+    return this.rateLimitStatus.remaining < 2 * this.requestsPerLoad();
+  }
+
+  isRateLimited(): boolean {
+    return this.rateLimitStatus.waitMs > 0;
+  }
+
+  loadsLeft(): number {
+    return Math.floor(this.rateLimitStatus.remaining / Math.max(1, this.requestsPerLoad()));
+  }
+
+  rateLimitWait(): string {
+    return formatWait(this.rateLimitStatus.waitMs);
   }
 
   isSiteAdmin(): any {

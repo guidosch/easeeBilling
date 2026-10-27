@@ -2,14 +2,14 @@
 
 ## 1. Tariff configuration
 
-- [ ] 1.1 Create `src/environments/tariffs.ts` with the `Tariff` interface and the three historical tariffs (2022-12-28, 2023-12-28, 2025-02-24) using today's hours (`highRateHours: [11, 12, 18, 19]`, `solarHours: [9..15]`); verify `npm run build` compiles
+- [ ] 1.1 Create `src/environments/tariffs.ts` with the `Tariff` interface and the three historical tariffs (2022-12-28, 2023-12-28, 2025-02-24) using today's hours (`highRateHours: [11, 12, 18, 19]`, `highRateDays: [1..6]` (Mon–Sat), `solarHours: [9..15]`); verify `npm run build` compiles
 - [ ] 1.2 Add `tariffs` to `environment.ts` and `environment.prod.ts` from the shared module; verify both dev (`ng build --configuration development`) and prod builds compile
 
 ## 2. Tariff lookup and classification
 
 - [ ] 2.1 Implement pure `findTariff(tariffs, instant)` (latest `validFrom` at or before the instant, start of day Europe/Zurich, `undefined` if none); verify with unit tests for mid-period, exact midnight boundary, previous-day 23:00 and before-earliest cases
 - [ ] 2.2 Check the format of `PowerUsage.from` in a real Easee response (offset present or not) and parse it accordingly; record the finding in a code comment
-- [ ] 2.3 Add `rate?: number` to `PowerUsage` in `Chargers.ts` and rewrite `checkTimeForHighRate(powerUsage, tariffs)` to use the Europe/Zurich hour and the entry's tariff; replace the `toLocaleTimeString` spy tests with fixed-offset ISO timestamps covering every configured hour, a default hour, a UTC-browser case and an entry before the earliest tariff; verify `npm test` passes
+- [ ] 2.3 Add `rate?: number` to `PowerUsage` in `Chargers.ts` and rewrite `checkTimeForHighRate(powerUsage, tariffs)` to use the Europe/Zurich hour and weekday and the entry's tariff; replace the `toLocaleTimeString` spy tests with fixed-offset ISO timestamps covering every configured hour, a Sunday high-rate hour (low rate), a default hour, a UTC-browser case and an entry before the earliest tariff; verify `npm test` passes
 
 ## 3. Pricing and display
 

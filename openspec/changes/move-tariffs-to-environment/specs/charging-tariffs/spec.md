@@ -7,7 +7,7 @@ Defines how hourly charger consumption is classified into high-rate, low-rate an
 ## ADDED Requirements
 
 ### Requirement: Dated tariff configuration
-The system SHALL read tariffs from the build environment configuration as a list of entries, each with a start date (`validFrom`), a high rate and a low rate in CHF/kWh, the hours of day billed at the high rate, and the hours of day eligible for solar. A tariff applies from the start of its `validFrom` day (Europe/Zurich) until the next tariff's `validFrom`.
+The system SHALL read tariffs from the build environment configuration as a list of entries, each with a start date (`validFrom`), a high rate and a low rate in CHF/kWh, the hours of day billed at the high rate, the weekdays on which those high-rate hours apply, and the hours of day eligible for solar. A tariff applies from the start of its `validFrom` day (Europe/Zurich) until the next tariff's `validFrom`.
 
 #### Scenario: Latest started tariff applies
 - **WHEN** tariffs start on 2023-12-28 and 2025-02-24 and an entry is dated 2025-03-10
@@ -22,11 +22,15 @@ The system SHALL read tariffs from the build environment configuration as a list
 - **THEN** the configuration contains the tariffs starting 2022-12-28 (40.77/14.49 Rp./kWh), 2023-12-28 (39.47/14.85 Rp./kWh) and 2025-02-24 (41.22/16.62 Rp./kWh)
 
 ### Requirement: Hour classification in Swiss local time
-The system SHALL classify each hourly consumption entry by the hour of its start time in the Europe/Zurich timezone, independent of the browser's locale and timezone. An entry is high-rate when that hour is in the applicable tariff's high-rate hours and solar-eligible when it is in the tariff's solar hours; otherwise it is low-rate and not solar-eligible.
+The system SHALL classify each hourly consumption entry by the hour of its start time in the Europe/Zurich timezone, independent of the browser's locale and timezone. An entry is high-rate when that hour is in the applicable tariff's high-rate hours and its Europe/Zurich weekday is in the tariff's high-rate days, and solar-eligible when it is in the tariff's solar hours; otherwise it is low-rate and not solar-eligible.
 
 #### Scenario: High-rate hour
 - **WHEN** the applicable tariff lists 11 as a high-rate hour and an entry starts at 11:00 Europe/Zurich
 - **THEN** the entry is classified as high-rate
+
+#### Scenario: Sunday is low rate all day
+- **WHEN** the applicable tariff lists 11 as a high-rate hour and Monday–Saturday as high-rate days, and an entry starts on a Sunday at 11:00 Europe/Zurich
+- **THEN** the entry is classified as low-rate and solar-eligible
 
 #### Scenario: Hour outside configured lists
 - **WHEN** an entry starts at 22:00 Europe/Zurich and 22 is in neither list

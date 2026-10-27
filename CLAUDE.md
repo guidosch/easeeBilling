@@ -60,9 +60,9 @@ src/app/
 
 - **Role-based view:** UserRole 2 = site admin (sees all chargers); others see only their assigned chargers
 - **Electricity rates (2025, CHF/kWh):**
-  - High rate: `0.4122` (peak hours: 11:00–12:00, 18:00–19:00)
-  - Low rate: `0.1662` (off-peak: 09:00–10:00, 13:00–16:00)
-- **Solar tracking:** 09:00–15:00
+  - High rate: `0.4122` (Monday–Saturday 11:00–13:00 and 18:00–20:00, i.e. hourly entries starting at 11, 12, 18, 19)
+  - Low rate: `0.1662` (all other hours, and all of Sunday)
+- **Solar tracking:** 09:00–16:00 (hourly entries starting at 9–15), every day
 - Charger-to-user mapping lives in `ChargersWithUsers.ts` (manually maintained, excluded from git)
 - Data loaded in parallel with `forkJoin()` across all chargers
 - Exports CSV with title "Abrechnung Ladestationen Tiechestrasse"

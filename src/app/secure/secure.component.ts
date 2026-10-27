@@ -439,6 +439,9 @@ export function checkTimeForHighRate(powerUsage: PowerUsage[]): PowerUsage[] {
         element.solarPower = false;
         break;
     }
+    if (new Date(element.from).getDay() === 0) { // Sunday: low rate all day
+      element.highRate = false;
+    }
   });
   return powerUsage;
 }

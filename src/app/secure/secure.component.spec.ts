@@ -225,6 +225,24 @@ describe('checkTimeForHighRate', () => {
     expect(result[0].highRate).toBe(true);
     expect(result[1].highRate).toBe(false);
   });
+
+  it('Sunday 11:00 — low rate, solar', () => {
+    const result = withLocalTime('11:00:00', () => [makeUsage('2026-10-25T11:00:00', 1)]);
+    expect(result[0].highRate).toBe(false);
+    expect(result[0].solarPower).toBe(true);
+  });
+
+  it('Sunday 18:00 — low rate, no solar', () => {
+    const result = withLocalTime('18:00:00', () => [makeUsage('2026-10-25T18:00:00', 1)]);
+    expect(result[0].highRate).toBe(false);
+    expect(result[0].solarPower).toBe(false);
+  });
+
+  it('Saturday 11:00 — high rate (HT), solar', () => {
+    const result = withLocalTime('11:00:00', () => [makeUsage('2026-10-24T11:00:00', 1)]);
+    expect(result[0].highRate).toBe(true);
+    expect(result[0].solarPower).toBe(true);
+  });
 });
 
 // ─── Component tests ──────────────────────────────────────────────────────────

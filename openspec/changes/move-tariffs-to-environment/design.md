@@ -23,19 +23,20 @@ export interface Tariff {
   highRate: number;         // CHF/kWh
   lowRate: number;          // CHF/kWh
   highRateHours: number[];  // start hours 0-23
+  highRateDays: number[];   // weekdays 0-6 (0 = Sunday) on which highRateHours apply
   solarHours: number[];     // start hours 0-23
 }
 ```
 The list lives in `src/environments/tariffs.ts`; `environment.ts` and `environment.prod.ts` both set `tariffs` from it.
 *Why:* dev and prod must bill identically; duplicating the list invites drift. *Alternative:* full copy in each file, rejected for that reason. Code reads `environment.tariffs`, so a future per-environment override stays possible.
 
-Hours are explicit lists (e.g. `highRateHours: [11, 12, 18, 19]`, `solarHours: [9, 10, 11, 12, 13, 14, 15]`) rather than ranges, because the current high-rate hours are non-contiguous. The seeded values reproduce today's `switch` exactly for all three historical tariffs (the old hours were never recorded per tariff).
+Hours are explicit lists (e.g. `highRateHours: [11, 12, 18, 19]`, `solarHours: [9, 10, 11, 12, 13, 14, 15]`) rather than ranges, because the current high-rate hours are non-contiguous. High-rate hours apply only on `highRateDays` (`[1, 2, 3, 4, 5, 6]`, Monday–Saturday); Sunday is low rate all day. Solar hours apply every day. The seeded values reproduce today's `switch` exactly for all three historical tariffs (the old hours were never recorded per tariff).
 
 ### Tariff lookup: sorted, latest `validFrom <= entry start`
 A pure `findTariff(tariffs, instant)` sorts by `validFrom` descending and returns the first whose start (`dayjs.tz(validFrom, 'Europe/Zurich')`) is not after the instant, or `undefined`. The list is tiny, so no caching is needed.
 
 ### Classification attaches the tariff to the entry
-`checkTimeForHighRate(powerUsage, tariffs)` computes `hour = dayjs(entry.from).tz('Europe/Zurich').hour()`, looks up the tariff, and sets `highRate`, `solarPower` and a new `rate: number | undefined` on `PowerUsage` (the CHF/kWh actually applied). `sumCosts()` then uses `entry.rate` and no longer knows about tariffs.
+`checkTimeForHighRate(powerUsage, tariffs)` computes `hour` and `weekday` from `dayjs(entry.from).tz('Europe/Zurich')`, looks up the tariff, and sets `highRate`, `solarPower` and a new `rate: number | undefined` on `PowerUsage` (the CHF/kWh actually applied). `sumCosts()` then uses `entry.rate` and no longer knows about tariffs.
 *Why:* keeps `sumCosts` simple and makes the applied rate inspectable in tests and debugging. *Alternative:* passing tariffs to `sumCosts` and looking up again, rejected as duplicate work.
 
 The timezone is fixed to `Europe/Zurich` because the tariffs belong to a Swiss utility, regardless of where the browser runs.

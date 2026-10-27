@@ -2,3 +2,11 @@
 - Allow substrct data by unselecting daysInMont
 - Runden auf 5 Rappen
 - Alle Zahlen mit zwei Stellen nach dem Komma
+
+
+chtarif: 
+- Montag - Samstag: 11:00 - 13:00 Uhr
+- Montag - Samstag: 18:00 - 20:00 Uhr
+
+Die übrigen Zeiten inkl. dem ganzen Sonntag sind Niedertarif. Ist der sonntag so programmiert?
+

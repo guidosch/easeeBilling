@@ -50,7 +50,7 @@ describe('RateLimitService', () => {
 
   it('should compute the wait time until enough requests are free', () => {
     const service = create();
-    recordMany(service, 50);
+    recordMany(service, MAX_REQUESTS - 50);
     jasmine.clock().tick(60 * 1000);
     recordMany(service, 45);
     //5 left, 15 needed -> wait until the 10th oldest request drops out

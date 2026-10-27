@@ -7,6 +7,7 @@ import { forkJoin, map } from 'rxjs';
 import { Charger, Permission, PowerUsage } from "../Chargers";
 import { User } from "../User";
 import { ErrorStateMatcher } from "@angular/material/core";
+import { MatChipSelectionChange } from "@angular/material/chips";
 import {
   FormControl,
   FormGroupDirective,
@@ -64,6 +65,8 @@ interface Chip {
 export class SecureComponent implements OnInit {
 
   chips: Chip[] = [];
+  //data loaded per selected month chip, needed to subtract it again when the chip gets unselected
+  private loadedMonths = new Map<string, Charger[]>();
   currentYear = dayjs().year();
 
   timePeriodForm!: UntypedFormGroup;
@@ -144,17 +147,48 @@ export class SecureComponent implements OnInit {
    * Click on an month chip
    * @param chip 
    */
-  changeSelected(chip: Chip): void {
+  changeSelected(chip: Chip, event: MatChipSelectionChange): void {
+    if (!event.isUserInput) {
+      return;
+    }
+    if (!event.selected) {
+      this.removeMonth(chipKey(chip));
+      return;
+    }
     let dateTime = dayjs().utc().set('month', chip.month).set('year', chip.year);
     let start = dateTime.set('date', 1).set('hour', 0).set('minute', 0);
     let end: dayjs.Dayjs = dayjs();
-    if (dayjs.utc().get('month') === chip.month) {
+    if (dayjs.utc().get('month') === chip.month && dayjs.utc().get('year') === chip.year) {
       end = dateTime.set('hour', 23).set('minute', 59);
     } else {
       end = dateTime.set('date', dateTime.daysInMonth()).set('hour', 23).set('minute', 59);
     }
 
-    this.loadData(start.toISOString(), end.toISOString());
+    this.loadData(start.toISOString(), end.toISOString(), chipKey(chip));
+  }
+
+  /**
+   * Subtract the data of an unselected month chip from the table
+   * @param key of the month chip
+   */
+  removeMonth(key: string): void {
+    const monthData = this.loadedMonths.get(key);
+    if (!monthData) {
+      return;
+    }
+    this.loadedMonths.delete(key);
+    monthData.forEach(chargerData => {
+      const charger = this.chargers.find(elem => elem.id === chargerData.id);
+      if (charger) {
+        charger.totalConsumption -= chargerData.totalConsumption;
+        charger.totalConsumptionEligibleForSolar -= chargerData.totalConsumptionEligibleForSolar;
+        charger.totalConsumptionKWhHighRate -= chargerData.totalConsumptionKWhHighRate;
+        charger.totalConsumptionKWhLowRate -= chargerData.totalConsumptionKWhLowRate;
+        charger.totalCostsInPeriod -= chargerData.totalCostsInPeriod;
+      }
+    });
+    //remove chargers without any costs left (tolerance for floating point rounding)
+    this.chargers = this.chargers.filter(charger => charger.totalCostsInPeriod > 1e-9);
   }
 
   onFormSubmit(): void {
@@ -194,7 +228,7 @@ export class SecureComponent implements OnInit {
   }
 
 
-  loadData(from: string, to: string): void {
+  loadData(from: string, to: string, monthKey?: string): void {
     const waitMs = this.rateLimit.msUntilAvailable(this.requestsPerLoad());
     if (waitMs > 0) {
       this.notifications.showError("API-Limit erreicht. Nächste Abfrage möglich in " + formatWait(waitMs) + " Min.");
@@ -223,7 +257,7 @@ export class SecureComponent implements OnInit {
       });
       return result;
     })).subscribe({
-      next: (data) => this.handleData(data),
+      next: (data) => this.handleData(data, monthKey),
       error: (e) => this.handleError(e),
       complete: () => console.info('complete')
     });
@@ -236,8 +270,17 @@ export class SecureComponent implements OnInit {
     return allChargers.filter(charger => charger.id == this.personalChargers[0])[0];
   }
 
-  handleData(data: Charger[]) {
+  handleData(data: Charger[], monthKey?: string) {
     data = data.filter(data => data.totalCostsInPeriod > 0);
+    if (monthKey) {
+      //chip got unselected while loading, ignore the data
+      if (!this.chips.some(chip => chipKey(chip) === monthKey && chip.state)) {
+        this.isLoadingResults = false;
+        return;
+      }
+      //keep a copy, the merged objects in the table get modified by later sums
+      this.loadedMonths.set(monthKey, structuredClone(data));
+    }
     if (data.length == 0) {
       this.notifications.showError("Keine Daten gefunden für diese Zeitpriode.");
     } else {
@@ -340,6 +383,7 @@ export class SecureComponent implements OnInit {
 
   reset() {
     this.chargers = [];
+    this.loadedMonths.clear();
     this.resetChips();
   }
 
@@ -368,6 +412,10 @@ export class SecureComponent implements OnInit {
     return Math.round(LOW_RATE * 100);
   }
 
+}
+
+function chipKey(chip: Chip): string {
+  return chip.year + "-" + chip.month;
 }
 
 export function getUsers(permissions: Permission[]) {

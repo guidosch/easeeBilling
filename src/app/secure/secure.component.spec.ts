@@ -414,6 +414,46 @@ describe('SecureComponent', () => {
     });
   });
 
+  describe('month chip selection', () => {
+    const chip = { name: 'March', state: true, month: 2, year: 2025 };
+
+    beforeEach(() => {
+      component.chargers = [];
+      component.chips = [chip, { name: 'February', state: true, month: 1, year: 2025 }];
+      chip.state = true;
+    });
+
+    it('should subtract the month again when its chip gets unselected', () => {
+      component.handleData([makeCharger('c1', 'PP01', { totalCostsInPeriod: 5, totalConsumption: 10 })], '2025-1');
+      component.handleData([makeCharger('c1', 'PP01', { totalCostsInPeriod: 3, totalConsumption: 6 })], '2025-2');
+
+      component.changeSelected(chip, { selected: false, isUserInput: true } as any);
+
+      expect(component.chargers[0].totalCostsInPeriod).toBeCloseTo(5, 5);
+      expect(component.chargers[0].totalConsumption).toBeCloseTo(10, 5);
+    });
+
+    it('should remove a charger from the table when nothing is left', () => {
+      component.handleData([makeCharger('c1', 'PP01', { totalCostsInPeriod: 3 })], '2025-2');
+
+      component.changeSelected(chip, { selected: false, isUserInput: true } as any);
+
+      expect(component.chargers.length).toBe(0);
+    });
+
+    it('should ignore data of a chip that was unselected while loading', () => {
+      chip.state = false;
+      component.handleData([makeCharger('c1', 'PP01', { totalCostsInPeriod: 3 })], '2025-2');
+      expect(component.chargers.length).toBe(0);
+    });
+
+    it('should ignore selection changes not triggered by the user', () => {
+      spyOn(component, 'loadData');
+      component.changeSelected(chip, { selected: true, isUserInput: false } as any);
+      expect(component.loadData).not.toHaveBeenCalled();
+    });
+  });
+
   describe('reset', () => {
     it('should clear the chargers list and regenerate chips', () => {
       component.chargers = [makeCharger('c1', 'PP01')];
